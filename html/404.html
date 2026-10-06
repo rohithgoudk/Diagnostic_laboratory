@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 – Sample Not Found</title>
+  <meta name="description" content="The page you requested could not be found.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/404.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body>
+
+  <!-- ============ BACKGROUND: molecule grid, glows, DNA helix, cells, ECG ============ -->
+  <div class="bg" aria-hidden="true">
+    <div class="bg-hex"></div>
+    <div class="bg-glow bg-glow--one"></div>
+    <div class="bg-glow bg-glow--two"></div>
+
+    <div class="helix helix--left" id="helixLeft"></div>
+    <div class="helix helix--right" id="helixRight"></div>
+
+    <span class="cell" style="--x: 12%; --y: 22%; --s: 64px"></span>
+    <span class="cell" style="--x: 84%; --y: 16%; --s: 42px"></span>
+    <span class="cell" style="--x: 76%; --y: 72%; --s: 74px"></span>
+    <span class="cell" style="--x: 18%; --y: 78%; --s: 38px"></span>
+    <span class="cell" style="--x: 50%; --y: 8%;  --s: 28px"></span>
+    <span class="cell" style="--x: 92%; --y: 46%; --s: 32px"></span>
+
+    <svg class="ecg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path id="ecgPath" d="M0 70 H180 L200 70 L215 40 L230 100 L250 10 L270 92 L285 70 H460 L480 70 L495 40 L510 100 L530 10 L550 92 L565 70 H740 L760 70 L775 55 L790 80 L800 70 H1200" />
+    </svg>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <a href="index.html" class="logo" aria-label="Go to homepage">
+      <img src="../assets/Logo.webp" alt="Company logo">
+    </a>
+    <span class="status-pill"><span class="pulse"></span>Lab systems online</span>
+  </header>
+
+  <!-- ============ MAIN ============ -->
+  <main class="error-wrap">
+    <section class="error-card" id="errorCard">
+
+      <!-- Test tube rack illustration -->
+      <div class="rack" aria-hidden="true">
+        <div class="tube tube--teal">
+          <span class="tube-label">A1</span>
+          <div class="liquid" style="--h: 62%"><i></i><i></i><i></i></div>
+        </div>
+        <div class="tube tube--blue">
+          <span class="tube-label">B2</span>
+          <div class="liquid" style="--h: 44%"><i></i><i></i><i></i></div>
+        </div>
+        <div class="tube tube--empty">
+          <span class="tube-label">404</span>
+          <span class="tube-q">?</span>
+        </div>
+        <div class="tube tube--violet">
+          <span class="tube-label">C3</span>
+          <div class="liquid" style="--h: 74%"><i></i><i></i><i></i></div>
+        </div>
+        <div class="rack-base"></div>
+      </div>
+
+      <p class="error-tag"><span class="tag-dot"></span>Error 404 · Sample not found</p>
+
+      <h1 class="error-code" aria-label="404">
+        <span class="digit" aria-hidden="true">4</span>
+        <span class="lens" aria-hidden="true">
+          <span class="lens-sweep"></span>
+          <span class="germ g1"></span>
+          <span class="germ g2"></span>
+          <span class="germ g3"></span>
+          <span class="germ g4"></span>
+        </span>
+        <span class="digit" aria-hidden="true">4</span>
+      </h1>
+
+      <h2 class="error-title">We couldn't locate this sample</h2>
+
+      <p class="error-text">
+        The page you're looking for doesn't exist, may have been moved,
+        or the link you followed has expired. Let's get you back to your reports.
+      </p>
+
+      <div class="actions">
+        <button type="button" class="btn btn--ghost" id="backBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          Go Back
+        </button>
+        <a href="index.html" class="btn btn--primary">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+          Back to Home
+        </a>
+      </div>
+
+      <!-- Mini lab report -->
+      <dl class="report">
+        <div class="report-row">
+          <dt>Sample ID</dt>
+          <dd class="mono">#404-NF</dd>
+        </div>
+        <div class="report-row">
+          <dt>Status</dt>
+          <dd><span class="badge">Not found</span></dd>
+        </div>
+        <div class="report-row">
+          <dt>Checked at</dt>
+          <dd class="mono" id="checkedAt">--:--</dd>
+        </div>
+      </dl>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Need help? <a href="mailto:support@example.com">Contact support</a></p>
+  </footer>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+    var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var HAS_GSAP = !!window.gsap;
+    var ANIM = HAS_GSAP && !REDUCED;
+    var $ = function (s, c) { return (c || document).querySelector(s); };
+    var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+
+    /* ---------- Back button: previous page, or home if no history ---------- */
+    // which page of this site sent you here (remembered by that page as you left it)
+    var cameFrom = '';
+    try { cameFrom = sessionStorage.getItem('lastPage') || ''; } catch (e) {}
+    if (/404\.html$/.test(cameFrom)) cameFrom = '';
+    $('#backBtn').addEventListener('click', function () {
+      // go back to the exact page and spot you came from; open the home page if you didn't come from this site
+      if (window.history.length > 1 && (cameFrom || document.referrer)) window.history.back();
+      else window.location.href = 'index.html';
+    });
+
+    /* ---------- Report time ---------- */
+    var now = new Date();
+    $('#checkedAt').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    /* ---------- Build DNA helixes ---------- */
+    function buildHelix(el, pairs) {
+      var html = '';
+      for (var i = 0; i < pairs; i++) html += '<span class="pair"><i></i><b></b><i></i></span>';
+      el.innerHTML = html;
+    }
+    buildHelix($('#helixLeft'), 16);
+    buildHelix($('#helixRight'), 16);
+
+    if (!ANIM) { document.documentElement.classList.add('no-anim'); return; }
+
+    /* ---------- Intro timeline ---------- */
+    var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.site-header > *', { y: -30, opacity: 0, duration: .7, stagger: .1 })
+      .from('#errorCard', { y: 60, scale: .96, opacity: 0, duration: 1 }, '-=.4')
+      .from('.tube', { y: -140, rotation: function (i) { return i % 2 ? 12 : -12; }, opacity: 0, duration: 1, stagger: .1, ease: 'bounce.out' }, '-=.6')
+      .from('.rack-base', { scaleX: 0, duration: .6 }, '-=1')
+      .from('.liquid', { height: 0, duration: 1.2, stagger: .12, ease: 'power2.inOut' }, '-=.4')
+      .from('.tube-q', { scale: 0, rotation: -90, duration: .6, ease: 'back.out(3)' }, '-=.6')
+      .from('.error-tag', { y: 16, opacity: 0, duration: .5 }, '-=.6')
+      .from('.error-code .digit', { yPercent: 80, rotationX: -90, opacity: 0, transformPerspective: 600, transformOrigin: '50% 100%', duration: .9, stagger: .2, ease: 'back.out(1.7)' }, '-=.4')
+      .from('.lens', { scale: 0, rotation: -180, opacity: 0, duration: 1, ease: 'expo.out' }, '-=.9')
+      .from('.germ', { scale: 0, duration: .5, stagger: .08, ease: 'back.out(3)' }, '-=.4')
+      .from('.error-title, .error-text', { y: 24, opacity: 0, duration: .7, stagger: .1 }, '-=.5')
+      .from('.actions .btn', { y: 20, opacity: 0, duration: .6, stagger: .1 }, '-=.4')
+      .from('.report-row', { y: 16, opacity: 0, duration: .5, stagger: .08 }, '-=.3')
+      .from('.site-footer', { opacity: 0, duration: .6 }, '-=.3');
+
+    /* ---------- ECG line draws on loop ---------- */
+    var ecg = $('#ecgPath'), len = ecg.getTotalLength();
+    gsap.set(ecg, { strokeDasharray: len, strokeDashoffset: len });
+    gsap.to(ecg, { strokeDashoffset: -len, duration: 6, ease: 'none', repeat: -1 });
+
+    /* ---------- DNA helixes twist ---------- */
+    $$('.helix').forEach(function (h, hi) {
+      $$('.pair', h).forEach(function (p, i) {
+        gsap.fromTo(p, { scaleX: 1 }, { scaleX: -1, duration: 1.6, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: -(i * .2) - hi * .7 });
+      });
+    });
+
+    /* ---------- Cells float around ---------- */
+    $$('.cell').forEach(function (c) {
+      gsap.to(c, {
+        x: 'random(-40, 40)', y: 'random(-50, 50)', rotation: 'random(-40, 40)',
+        duration: 'random(5, 9)', ease: 'sine.inOut', repeat: -1, yoyo: true, repeatRefresh: true
+      });
+    });
+
+    /* ---------- Bubbles in tubes ---------- */
+    $$('.liquid i').forEach(function (b) {
+      gsap.fromTo(b, { y: 0, opacity: 0, scale: .4 }, {
+        y: -70, opacity: .9, scale: 1, duration: 'random(1.6, 2.8)', ease: 'power1.in',
+        repeat: -1, delay: 'random(0, 2.5)', repeatRefresh: true
+      });
+    });
+
+    /* ---------- Empty tube wobbles, lens scans, germs wiggle ---------- */
+    gsap.to('.tube--empty', { rotation: 4, duration: 1.4, ease: 'sine.inOut', repeat: -1, yoyo: true, transformOrigin: '50% 100%', delay: 2.5 });
+    gsap.to('.tube-q', { y: -6, duration: 1.1, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.5 });
+    gsap.to('.lens-sweep', { rotation: 360, duration: 3.5, ease: 'none', repeat: -1 });
+    $$('.germ').forEach(function (g) {
+      gsap.to(g, { x: 'random(-8, 8)', y: 'random(-8, 8)', duration: 'random(1.2, 2)', ease: 'sine.inOut', repeat: -1, yoyo: true, repeatRefresh: true });
+    });
+    gsap.to('.tag-dot', { scale: 1.6, opacity: .4, duration: .8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+
+    /* ---------- Mouse parallax (desktop only) ---------- */
+    if (FINE) {
+      var qx = gsap.quickTo('.bg-hex', 'x', { duration: 1, ease: 'power3.out' });
+      var qy = gsap.quickTo('.bg-hex', 'y', { duration: 1, ease: 'power3.out' });
+      var hx = gsap.quickTo('.helix', 'x', { duration: 1.2, ease: 'power3.out' });
+      var cx = gsap.quickTo('#errorCard', 'rotationY', { duration: .8, ease: 'power3.out' });
+      var cy = gsap.quickTo('#errorCard', 'rotationX', { duration: .8, ease: 'power3.out' });
+      gsap.set('#errorCard', { transformPerspective: 1400 });
+      window.addEventListener('pointermove', function (e) {
+        var nx = e.clientX / innerWidth - .5, ny = e.clientY / innerHeight - .5;
+        qx(nx * -24); qy(ny * -24); hx(nx * 30);
+        cx(nx * 5); cy(ny * -5);
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

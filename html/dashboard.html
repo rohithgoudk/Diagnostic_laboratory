@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview – Diagnostic Laboratory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/dashboard.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body>
+
+  <!-- Background: electrophoresis gel — lanes with bands slowly migrating (same as the admin console) -->
+  <div class="bg" aria-hidden="true">
+    <div class="bg-gel"></div>
+    <div class="bg-bands" id="bgBands"></div>
+    <div class="bg-glow bg-glow--one"></div>
+    <div class="bg-glow bg-glow--two"></div>
+  </div>
+
+  <!-- ============ SIDEBAR (fixed on desktop, drawer on tablet/phone) ============ -->
+  <div class="scrim" id="scrim"></div>
+  <aside class="dock" id="sidebar" aria-label="Main menu">
+    <div class="dock-head">
+      <button class="brand" data-nav="dashboard" aria-label="Go to overview">
+        <img class="brand-img" src="../assets/Logo.webp" alt="Company logo">
+      </button>
+      <button class="dock-close" id="dock-close" aria-label="Close menu">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="dock-status">
+      <span class="live-dot"></span>
+      <div>
+        <span class="dock-status-title">Lab open · 6:30 AM – 9 PM</span>
+        <span class="dock-status-sub">Home collection slots free today</span>
+      </div>
+    </div>
+
+    <div class="dock-scroll" id="nav-drawer"></div>
+
+    <div class="dock-help">
+      <span class="dock-help-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+      <div><b>Need help with a report?</b><a href="tel:07123712345">Call 0712 371 2345</a></div>
+    </div>
+
+    <div class="dock-foot">
+      <div class="dock-user">
+        <span class="avatar" id="sidebar-user-avatar">–</span>
+        <div class="dock-user-info">
+          <span class="dock-user-name" id="sidebar-user-name">Signed out</span>
+          <span class="dock-user-email" id="sidebar-user-email">—</span>
+        </div>
+      </div>
+      <button class="dock-signout" id="logout-btn" aria-label="Sign out" title="Sign out">
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="head" id="topbar">
+    <div class="head-left">
+      <button class="burger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <button class="brand brand--head" data-nav="dashboard" aria-label="Go to overview">
+        <img class="brand-img" src="../assets/Logo.webp" alt="Company logo">
+      </button>
+      <span class="range-badge"><svg viewBox="0 0 24 24"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg>Next visit · Tue 7 Oct</span>
+    </div>
+
+    <div class="head-right">
+      <form class="finder" id="topbar-search" autocomplete="off" role="search">
+        <button type="submit" class="finder-go" aria-label="Search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>
+        </button>
+        <input id="topbar-search-input" placeholder="Search reports, tests, invoices…" aria-label="Search">
+        <kbd class="finder-key">/</kbd>
+      </form>
+
+      <button class="icon-btn" id="notif-btn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.5 20a2 2 0 0 0 3 0"/></svg>
+        <span class="icon-dot"></span>
+      </button>
+
+      <div class="whoami" id="topbar-user">
+        <button class="whoami-btn" id="topbar-user-btn" aria-haspopup="true" aria-expanded="false">
+          <span class="avatar sm" id="topbar-user-avatar">–</span>
+          <span class="whoami-text">
+            <span class="whoami-name" id="topbar-user-name">Signed out</span>
+            <span class="whoami-role" id="topbar-user-role">Patient</span>
+          </span>
+          <svg class="whoami-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="whoami-menu" id="topbar-user-menu">
+          <div class="whoami-menu-head">
+            <span>Signed in as</span>
+            <span class="whoami-menu-email" id="topbar-user-email">—</span>
+          </div>
+          <button class="whoami-item" data-nav="settings">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg>
+            Settings
+          </button>
+          <button class="whoami-item danger" id="topbar-logout-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg>
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ PAGE ============ -->
+  <main class="page">
+    <div class="page-head" id="page-head">
+      <div>
+        <p class="page-kicker" id="page-kicker">My health</p>
+        <h1 id="page-title-text">Overview</h1>
+        <p class="page-sub" id="page-sub-text"></p>
+      </div>
+      <div class="page-actions" id="page-actions"></div>
+    </div>
+    <div class="content" id="content-area"></div>
+    <p class="page-note">Results are for information only. Please discuss them with your doctor before making any health decision.</p>
+  </main>
+
+  <div class="chart-tip" id="chart-tip" role="status"></div>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <script>
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ANIM = !!window.gsap && !REDUCED;
+
+  /* =========================================================
+     ICONS
+     ========================================================= */
+  const ICONS = {
+    grid:     'M4 4h7v7H4zM13 4h7v4h-7zM13 12h7v8h-7zM4 15h7v5H4z',
+    doc:      'M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h5',
+    flask:    'M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-2.5L14 9V3M7 15h10',
+    trend:    'M3 17l6-6 4 4 8-8M15 7h6v6',
+    cart:     'M4 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L21 8H7M10 20h.01M17 20h.01',
+    card:     'M3 6h18v12H3zM3 10h18M7 15h4',
+    bell:     'M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6M10.5 20a2 2 0 0 0 3 0',
+    gear:     'M12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1',
+    users:    'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M2.5 20c.8-3.5 3.5-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14.5c2 .7 3.2 2.6 3.5 5.5',
+    clock:    'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2',
+    alert:    'M12 4l9 16H3zM12 10v4.2M12 17.4v.4',
+    info:     'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 11v6M12 7.5v.5',
+    check:    'M20 6L9 17l-5-5',
+    pulse:    'M3 12h4l2-6 4 12 2-6h6',
+    plus:     'M12 5v14M5 12h14',
+    download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
+    calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+    home:     'M3 11l9-8 9 8M5 10v10h14V10',
+    drop:     'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z',
+    share:    'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6M8.6 13.5l6.8 4M15.4 6.5l-6.8 4',
+    rupee:    'M6 4h12M6 9h12M13 20L7 14h2a4.5 4.5 0 0 0 0-10',
+    pin:      'M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21zM12 7.1a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8',
+    receipt:  'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3',
+    shield:   'M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3zM9 12l2 2 4-4'
+  };
+  function ico(name, cls) {
+    return `<svg class="${cls || 'ico'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${ICONS[name] || ICONS.grid}"/></svg>`;
+  }
+
+  /* =========================================================
+     DEMO DATA — one patient's lab portal
+     ========================================================= */
+  const reports = [
+    { id: 'RPT-24790', test: 'Lipid profile',              cat: 'Heart',    date: '2 Oct 2026',  doctor: 'Dr. Meera Iyer',  status: 'Ready',      flags: 1 },
+    { id: 'RPT-24788', test: 'Complete blood count (CBC)', cat: 'Blood',    date: '2 Oct 2026',  doctor: 'Dr. Meera Iyer',  status: 'Ready',      flags: 0 },
+    { id: 'RPT-24817', test: 'Vitamin D & B12',            cat: 'Vitamins', date: 'Today',       doctor: 'Awaiting review', status: 'Processing', flags: 0 },
+    { id: 'RPT-24751', test: 'HbA1c (3-month sugar)',      cat: 'Diabetes', date: '28 Sep 2026', doctor: 'Dr. Arjun Rao',   status: 'Ready',      flags: 1 },
+    { id: 'RPT-24702', test: 'Thyroid profile (T3, T4, TSH)', cat: 'Hormones', date: '21 Sep 2026', doctor: 'Dr. Meera Iyer', status: 'Ready',    flags: 0 },
+    { id: 'RPT-24655', test: 'Urine routine & microscopy', cat: 'Urine',    date: '14 Sep 2026', doctor: 'Dr. Arjun Rao',   status: 'Ready',      flags: 0 },
+    { id: 'RPT-24610', test: 'Liver function test (LFT)',  cat: 'Blood',    date: '14 Sep 2026', doctor: 'Dr. Meera Iyer',  status: 'Ready',      flags: 0 },
+    { id: 'RPT-24598', test: 'Vitamin D (25-OH)',          cat: 'Vitamins', date: '2 Aug 2026',  doctor: 'Dr. Arjun Rao',   status: 'Ready',      flags: 1 }
+  ];
+  const reportCats = ['All', 'Blood', 'Heart', 'Diabetes', 'Hormones', 'Vitamins', 'Urine'];
+  const catColor = { Blood: '#e11d48', Heart: '#f97316', Diabetes: '#2563eb', Hormones: '#8b5cf6', Vitamins: '#d97706', Urine: '#0d9488', Packages: '#0f766e' };
+
+  // Latest values with reference range; scale = drawing range of the bar
+  const latest = [
+    { name: 'Haemoglobin',     v: 13.8, unit: 'g/dL',   lo: 13,  hi: 17,  min: 10, max: 20 },
+    { name: 'Fasting glucose', v: 92,   unit: 'mg/dL',  lo: 70,  hi: 100, min: 50, max: 160 },
+    { name: 'HbA1c',           v: 6.1,  unit: '%',      lo: 4,   hi: 5.7, min: 3,  max: 9 },
+    { name: 'LDL cholesterol', v: 138,  unit: 'mg/dL',  lo: 0,   hi: 100, min: 0,  max: 200 },
+    { name: 'TSH',             v: 2.1,  unit: 'mIU/L',  lo: 0.4, hi: 4,   min: 0,  max: 8 },
+    { name: 'Vitamin D',       v: 24,   unit: 'ng/mL',  lo: 30,  hi: 100, min: 0,  max: 120 }
+  ];
+  const outOfRange = latest.filter(r => r.v < r.lo || r.v > r.hi);
+
+  const trendMonths = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+  const markers = {
+    'HbA1c':           { unit: '%',     lo: 4,   hi: 5.7, data: [6.6, 6.5, 6.4, 6.4, 6.3, 6.2, 6.2, 6.1], dec: 1, color: '#2563eb',
+                         about: 'Average blood sugar over the last 2–3 months. 5.7–6.4% is the prediabetes range; below 5.7% is normal.' },
+    'Fasting glucose': { unit: 'mg/dL', lo: 70,  hi: 100, data: [118, 112, 109, 104, 101, 98, 95, 92], dec: 0, color: '#0d9488',
+                         about: 'Blood sugar after 8–12 hours without food. It has moved back into the normal range since July.' },
+    'LDL cholesterol': { unit: 'mg/dL', lo: 0,   hi: 100, data: [162, 158, 150, 149, 145, 141, 140, 138], dec: 0, color: '#f97316',
+                         about: 'The “bad” cholesterol that builds up in arteries. Below 100 mg/dL is the target for most adults.' },
+    'Haemoglobin':     { unit: 'g/dL',  lo: 13,  hi: 17,  data: [12.6, 12.9, 13.1, 13.0, 13.4, 13.6, 13.5, 13.8], dec: 1, color: '#e11d48',
+                         about: 'The oxygen-carrying protein in red blood cells. Low values can point to anaemia.' },
+    'Vitamin D':       { unit: 'ng/mL', lo: 30,  hi: 100, data: [14, 16, 19, 21, 20, 22, 23, 24], dec: 0, color: '#d97706',
+                         about: 'Needed for bones and immunity. 20–29 ng/mL is insufficient; 30–100 ng/mL is sufficient.' }
+  };
+
+  const SAMPLE_STEPS = ['Collected', 'Received', 'Analysing', 'Reviewed', 'Report ready'];
+  const samples = [
+    { id: 'LB-24817', test: 'Vitamin D & B12',        tube: 'Gold top · serum',    collected: 'Today 08:12',  where: 'Home collection',  stage: 2, eta: 'Today, around 2 PM', times: ['08:12', '09:40', 'now', '', ''] },
+    { id: 'LB-24802', test: 'Urine culture',          tube: 'Sterile container',   collected: 'Yesterday 07:50', where: 'Salem main centre', stage: 1, eta: 'In 48 hours (culture)', times: ['07:50', '08:35', '', '', ''] },
+    { id: 'LB-24790', test: 'Lipid profile + CBC',    tube: 'Gold + lavender top', collected: '2 Oct 07:20',  where: 'Home collection',  stage: 4, eta: 'Delivered', times: ['07:20', '08:55', '10:30', '12:10', '12:40'] }
+  ];
+
+  const tests = [
+    { name: 'Full body checkup',       cat: 'Packages', params: 72, price: 2499, mrp: 3999, tat: '24 h', fasting: true,  popular: true },
+    { name: 'Complete blood count',    cat: 'Blood',    params: 28, price: 349,  mrp: 500,  tat: '6 h',  fasting: false },
+    { name: 'Lipid profile',           cat: 'Heart',    params: 8,  price: 599,  mrp: 900,  tat: '12 h', fasting: true },
+    { name: 'HbA1c',                   cat: 'Diabetes', params: 1,  price: 449,  mrp: 650,  tat: '12 h', fasting: false },
+    { name: 'Thyroid profile',         cat: 'Hormones', params: 3,  price: 549,  mrp: 800,  tat: '24 h', fasting: false },
+    { name: 'Vitamin D (25-OH)',       cat: 'Vitamins', params: 1,  price: 899,  mrp: 1400, tat: '24 h', fasting: false },
+    { name: 'Diabetes care package',   cat: 'Packages', params: 34, price: 1299, mrp: 2100, tat: '24 h', fasting: true,  popular: true },
+    { name: 'Liver function test',     cat: 'Blood',    params: 11, price: 699,  mrp: 1000, tat: '12 h', fasting: false },
+    { name: 'Heart health package',    cat: 'Packages', params: 46, price: 1899, mrp: 3200, tat: '24 h', fasting: true }
+  ];
+  const testCats = ['All', 'Packages', 'Blood', 'Heart', 'Diabetes', 'Hormones', 'Vitamins'];
+
+  const bookings = [
+    { title: 'Home sample collection', tests: 'HbA1c + Lipid profile', when: 'Tue 7 Oct · 07:30–08:30', where: 'Home · Fairlands, Salem', fasting: true },
+    { title: 'Walk-in visit',          tests: 'Thyroid profile',        when: 'Sat 11 Oct · 09:00',      where: 'Salem main centre',      fasting: false }
+  ];
+
+  const invoices = [
+    { id: 'INV-3381', desc: 'Lipid profile + CBC',  date: '2 Oct 2026',  amount: 948,  method: 'UPI',  status: 'Paid' },
+    { id: 'INV-3370', desc: 'Vitamin D & B12',      date: '4 Oct 2026',  amount: 1499, method: '—',    status: 'Due' },
+    { id: 'INV-3352', desc: 'HbA1c',                date: '28 Sep 2026', amount: 449,  method: 'Card', status: 'Paid' },
+    { id: 'INV-3342', desc: 'Full body checkup',    date: '14 Sep 2026', amount: 2499, method: 'Card', status: 'Paid' },
+    { id: 'INV-3315', desc: 'Thyroid profile',      date: '21 Sep 2026', amount: 549,  method: 'UPI',  status: 'Paid' },
+    { id: 'INV-3290', desc: 'Urine culture (cancelled)', date: '18 Jul 2026', amount: 650, method: 'UPI', status: 'Refunded' }
+  ];
+  const invStatus = { Paid: 'good', Due: 'warn', Refunded: 'muted' };
+
+  const notes = [
+    { text: 'LDL cholesterol is above the reference range (138 mg/dL)', meta: 'Lipid profile · RPT-24790', level: 'attention', time: '2 Oct' },
+    { text: 'Vitamin D is below the reference range (24 ng/mL)',        meta: 'Vitamin D · RPT-24598',    level: 'attention', time: '2 Aug' },
+    { text: 'Fast for 10–12 hours before Tuesday’s home collection',    meta: 'Booking · Tue 7 Oct',      level: 'reminder',  time: 'Today' },
+    { text: 'Invoice INV-3370 of ₹1,499 is due',                         meta: 'Billing',                  level: 'reminder',  time: 'Today' },
+    { text: 'Your Lipid profile + CBC reports are ready to download',   meta: 'Reports',                  level: 'update',    time: '2 Oct' },
+    { text: 'Sample LB-24817 reached the lab and is being analysed',    meta: 'Sample tracking',          level: 'update',    time: '09:40' }
+  ];
+  const levelIcon = { attention: 'alert', reminder: 'clock', update: 'info' };
+
+  const prepTips = [
+    'Fast for 10–12 hours; plain water is fine.',
+    'Take regular medicines unless your doctor says otherwise.',
+    'Keep a photo ID and your booking ID ready.',
+    'Avoid heavy exercise and alcohol for 24 hours before.'
+  ];
+
+  /* =========================================================
+     NAVIGATION
+     ========================================================= */
+  const navGroups = {
+    health:   [ { label: 'Overview',        id: 'dashboard', icon: 'grid' },
+                { label: 'My reports',      id: 'reports',   icon: 'doc',   badge: () => reports.filter(r => r.status === 'Processing').length },
+                { label: 'Sample tracking', id: 'samples',   icon: 'flask', badge: () => samples.filter(s => s.stage < 4).length },
+                { label: 'Health trends',   id: 'trends',    icon: 'trend' } ],
+    services: [ { label: 'Book a test',     id: 'book',      icon: 'cart' },
+                { label: 'Billing',         id: 'billing',   icon: 'card',  badge: () => invoices.filter(i => i.status === 'Due').length } ],
+    account:  [ { label: 'Notifications',   id: 'alerts',    icon: 'bell',  badge: () => notes.filter(n => n.level === 'attention').length },
+                { label: 'Settings',        id: 'settings',  icon: 'gear' } ]
+  };
+  const groupLabels = { health: 'My health', services: 'Services', account: 'Account' };
+
+  const pageMap = {
+    dashboard: { title: 'Overview',        sub: 'Your results, samples and bookings at a glance' },
+    reports:   { title: 'My reports',      sub: 'Every report from your tests, newest first' },
+    samples:   { title: 'Sample tracking', sub: 'Follow each sample from collection to report' },
+    trends:    { title: 'Health trends',   sub: 'How your key markers have changed over time' },
+    book:      { title: 'Book a test',     sub: 'Tests and packages with free home collection over ₹999' },
+    billing:   { title: 'Billing',         sub: 'Invoices, payments and refunds' },
+    alerts:    { title: 'Notifications',   sub: 'Results to discuss, reminders and updates' },
+    settings:  { title: 'Settings',        sub: 'Your profile and preferences' }
+  };
+  const pageActions = {
+    dashboard: `<button class="btn btn-ghost" onclick="go404()">${ico('download')}Latest report</button><button class="btn btn-solid" data-nav="book">${ico('plus')}Book a test</button>`,
+    reports:   `<button class="btn btn-ghost" onclick="go404()">${ico('share')}Share with doctor</button><button class="btn btn-solid" onclick="go404()">${ico('download')}Download all</button>`,
+    samples:   `<button class="btn btn-solid" data-nav="book">${ico('home')}Book home collection</button>`,
+    trends:    `<button class="btn btn-ghost" onclick="go404()">${ico('download')}Export PDF</button>`,
+    book:      `<button class="btn btn-solid" onclick="go404()">${ico('cart')}View cart</button>`,
+    billing:   `<button class="btn btn-solid" onclick="go404()">${ico('rupee')}Pay ₹1,499 due</button>`,
+    alerts:    `<button class="btn btn-ghost" onclick="go404()">${ico('check')}Mark all as read</button>`
+  };
+
+  /* =========================================================
+     SIGNED-IN USER (from login page → localStorage "user")
+     ========================================================= */
+  const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  const USER_KEYS = ['user', 'currentUser', 'loggedInUser', 'authUser', 'userData', 'profile', 'account', 'session', 'userEmail', 'email'];
+  let foundUserKey = null;
+
+  function asEmail(v) { return typeof v === 'string' && EMAIL_RE.test(v.trim()) ? v.trim() : null; }
+  function findEmailIn(obj, depth) {
+    if (!obj || depth > 4) return null;
+    if (typeof obj === 'string') {
+      const e = asEmail(obj); if (e) return { email: e };
+      try { return findEmailIn(JSON.parse(obj), depth + 1); } catch (err) { return null; }
+    }
+    if (typeof obj !== 'object') return null;
+    for (const k in obj) { const e = asEmail(obj[k]); if (e) return Object.assign({}, obj, { email: e }); }
+    for (const k in obj) { const hit = findEmailIn(obj[k], depth + 1); if (hit) return Object.assign({}, obj, hit); }
+    return null;
+  }
+  function getCurrentUser() {
+    const stores = [];
+    try { stores.push(localStorage); } catch (e) {}
+    try { stores.push(sessionStorage); } catch (e) {}
+    for (const s of stores) { try { if (s.getItem('isAuthenticated') === 'false') return null; } catch (e) {} }
+    for (const s of stores) {
+      for (const key of USER_KEYS) {
+        let hit = null;
+        try { hit = findEmailIn(s.getItem(key), 0); } catch (e) {}
+        if (hit) { foundUserKey = key; return hit; }
+      }
+    }
+    return null;
+  }
+
+  const currentUser = getCurrentUser();
+  const currentEmail = currentUser ? currentUser.email : '';
+  const storedName = currentUser && typeof currentUser.name === 'string' ? currentUser.name : '';
+  const currentUsername = storedName || (currentEmail ? currentEmail.split('@')[0] : '');
+  const currentInitial = ((currentUsername || currentEmail || '?').charAt(0) || '?').toUpperCase();
+  const currentRole = currentUser ? (currentUser.role === 'admin' ? 'Lab administrator' : 'Patient') : 'Not signed in';
+
+  function paintUserChrome() {
+    const name = currentUsername || 'Signed out';
+    const email = currentEmail || '—';
+    document.querySelectorAll('#sidebar-user-avatar, #topbar-user-avatar').forEach(el => el.textContent = currentInitial);
+    const sName = document.getElementById('sidebar-user-name');
+    sName.textContent = name; sName.title = name;
+    const sEmail = document.getElementById('sidebar-user-email');
+    sEmail.textContent = email; sEmail.title = email;
+    document.getElementById('topbar-user-name').textContent = name;
+    document.getElementById('topbar-user-email').textContent = email;
+    document.getElementById('topbar-user-role').textContent = currentRole;
+  }
+
+  function logout() {
+    const keys = ['user', 'isAuthenticated', 'activeNav', 'settings'].concat(USER_KEYS);
+    if (foundUserKey && keys.indexOf(foundUserKey) === -1) keys.push(foundUserKey);
+    keys.forEach(k => {
+      try { localStorage.removeItem(k); } catch (e) {}
+      try { sessionStorage.removeItem(k); } catch (e) {}
+    });
+    window.location.href = 'login.html';
+  }
+
+  /* =========================================================
+     STATE
+     ========================================================= */
+  function readStore(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function writeStore(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function loadSettings() {
+    const d = { smsReady: true, emailPdf: true, shareDoctor: false, fastingReminders: true, units: 'Conventional (mg/dL)', language: 'English' };
+    try { const raw = readStore('settings'); if (raw) return Object.assign(d, JSON.parse(raw)); } catch (e) {}
+    return d;
+  }
+  function saveSettings() { writeStore('settings', JSON.stringify(state.settings)); }
+
+  const saved = readStore('activeNav');
+  let state = {
+    activeNav: saved && pageMap[saved] ? saved : 'dashboard',
+    reportCat: 'All',
+    testCat: 'All',
+    testSearch: '',
+    marker: 'HbA1c',
+    settings: loadSettings()
+  };
+
+  function go404() { window.location.href = '404.html'; }
+  function fmt(n) { return n.toLocaleString('en-IN'); }
+  function rupees(n) { return '₹' + fmt(n); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  /* =========================================================
+     SHARED PIECES
+     ========================================================= */
+  function kpiRow(items) {
+    return `<section class="kpis">${items.map((k, i) => `
+      <article class="kpi anim" style="--c:${k.color || '#0d9488'}" onclick="${k.nav ? '' : 'go404()'}" ${k.nav ? `data-nav="${k.nav}"` : ''}>
+        <div class="kpi-top">
+          <span class="kpi-ico">${ico(k.icon || 'pulse')}</span>
+          ${k.trend ? `<span class="kpi-trend ${k.trend.good === false ? 'trend-bad' : 'trend-good'}">${k.trend.text}</span>` : ''}
+        </div>
+        <span class="kpi-value" ${k.count === false ? '' : 'data-count'}>${k.value}</span>
+        <span class="kpi-label">${k.label}</span>
+        ${k.bar !== undefined ? `<span class="kpi-track"><span class="kpi-fill" data-w="${k.bar}"></span></span>` : ''}
+        ${k.note ? `<span class="kpi-note">${k.note}</span>` : ''}
+      </article>`).join('')}</section>`;
+  }
+  function card(o, body) {
+    return `<section class="card anim ${o.cls || ''}">
+      <header class="card-head">
+        <div><h2>${ico(o.icon || 'grid', 'head-ico')}${o.title}</h2>${o.sub ? `<p>${o.sub}</p>` : ''}</div>
+        ${o.aside || ''}
+      </header>
+      ${body}
+    </section>`;
+  }
+  function chips(list, current, cls) {
+    return `<div class="chip-row">${list.map(c => `<button class="chip ${cls} ${current === c ? 'chip-on' : ''}" data-filter="${c}">${c}</button>`).join('')}</div>`;
+  }
+
+  /* reference-range bar: green band = normal range, marker = your value */
+  function rangeBar(r) {
+    const pct = v => Math.max(0, Math.min(100, (v - r.min) / (r.max - r.min) * 100));
+    const out = r.v < r.lo || r.v > r.hi;
+    return `<span class="rbar" data-tip="${r.name}: ${r.v} ${r.unit} · normal ${r.lo}–${r.hi}" tabindex="0">
+      <span class="rbar-band" style="left:${pct(r.lo)}%;width:${pct(r.hi) - pct(r.lo)}%"></span>
+      <i class="rbar-mark ${out ? 'is-out' : ''}" data-left="${pct(r.v).toFixed(1)}" style="left:${pct(r.v).toFixed(1)}%"></i>
+    </span>`;
+  }
+  function resultRow(r, i) {
+    const out = r.v < r.lo || r.v > r.hi;
+    const label = out ? (r.v > r.hi ? 'High' : 'Low') : 'Normal';
+    return `<li class="res row-anim">
+      <span class="res-name">${r.name}</span>
+      <span class="res-val"><b>${r.v}</b> ${r.unit}</span>
+      ${rangeBar(r)}
+      <span class="flag ${out ? 'flag-out' : 'flag-ok'}">${label}</span>
+    </li>`;
+  }
+
+  /* stepper for a sample's journey through the lab */
+  function stepper(s) {
+    return `<ol class="stepper" style="--done:${(s.stage / (SAMPLE_STEPS.length - 1) * 100).toFixed(1)}">
+      <span class="stepper-track"><span class="stepper-fill" data-w="${(s.stage / (SAMPLE_STEPS.length - 1) * 100).toFixed(1)}"></span></span>
+      ${SAMPLE_STEPS.map((label, i) => `<li class="st ${i < s.stage ? 'st-done' : i === s.stage ? (s.stage === 4 ? 'st-done' : 'st-live') : ''}">
+        <span class="st-dot">${i < s.stage || s.stage === 4 ? ico('check', 'st-ico') : ''}</span>
+        <b>${label}</b><em>${s.times[i] || '—'}</em>
+      </li>`).join('')}
+    </ol>`;
+  }
+
+  /* line chart for one marker with its normal range shaded */
+  function trendChart(key, compact) {
+    const m = markers[key], W = 600, H = 220;
+    const lo = Math.min(...m.data, m.lo), hi = Math.max(...m.data, m.hi);
+    const pad = (hi - lo) * .15 || 1;
+    const ymin = Math.max(0, lo - pad), ymax = hi + pad;
+    const yp = v => (v - ymin) / (ymax - ymin);
+    const x = i => i / (m.data.length - 1) * W;
+    const pts = m.data.map((v, i) => `${x(i).toFixed(1)},${(H - yp(v) * H).toFixed(1)}`).join(' ');
+    const ticks = [0, 1, 2, 3].map(t => ymin + (ymax - ymin) * t / 3);
+    const grid = ticks.map(v => `<span class="tc-grid" style="bottom:${(yp(v) * 100).toFixed(2)}%"><em>${v.toFixed(m.dec)}</em></span>`).join('');
+    const bandBottom = yp(Math.max(m.lo, ymin)) * 100, bandTop = yp(Math.min(m.hi, ymax)) * 100;
+    const pos = i => (i / (m.data.length - 1) * 100).toFixed(2);
+    const dots = m.data.map((v, i) => {
+      const out = v < m.lo || v > m.hi;
+      return `<div class="tc-col" style="left:${pos(i)}%" tabindex="0" data-tip="${trendMonths[i]} 2026 · ${v} ${m.unit}${out ? ' · outside normal range' : ''}">
+        <span class="tc-dot ${out ? 'is-out' : ''}" style="bottom:${(yp(v) * 100).toFixed(2)}%;--c:${m.color}"></span></div>`;
+    }).join('');
+    return `<div class="tc-legend">
+        <span><i style="background:${m.color}"></i>${key} (${m.unit})</span>
+        <span><i class="band"></i>Normal range ${m.lo}–${m.hi}</span>
+      </div>
+      <div class="tc ${compact ? 'tc-compact' : ''}" role="img" aria-label="${key} over the last ${m.data.length} months">
+        <div class="tc-plot">
+          ${grid}
+          <span class="tc-band" style="bottom:${bandBottom.toFixed(2)}%;height:${(bandTop - bandBottom).toFixed(2)}%"></span>
+          <svg class="tc-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+            <defs><linearGradient id="tcFill-${key.replace(/\W/g, '')}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="${m.color}" stop-opacity=".22"/><stop offset="1" stop-color="${m.color}" stop-opacity="0"/>
+            </linearGradient></defs>
+            <polygon class="tc-area" points="0,${H} ${pts} ${W},${H}" fill="url(#tcFill-${key.replace(/\W/g, '')})"/>
+            <polyline class="tc-line" points="${pts}" stroke="${m.color}"/>
+          </svg>
+          <div class="tc-cols">${dots}</div>
+        </div>
+        <div class="tc-x">${trendMonths.map((mo, i) => `<span style="left:${pos(i)}%">${mo}</span>`).join('')}</div>
+      </div>`;
+  }
+
+  /* =========================================================
+     OVERVIEW
+     ========================================================= */
+  function greeting() {
+    const h = new Date().getHours();
+    return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  }
+
+  function renderDashboard() {
+    const name = currentUsername || 'there';
+    const ready = reports.filter(r => r.status === 'Ready').length;
+    const inLab = samples.filter(s => s.stage < 4);
+    const hello = `<section class="hello anim">
+        <div class="hello-copy">
+          <p class="hello-kicker">${greeting()}, ${esc(name)}</p>
+          <h2 class="hello-title">Your <span class="grad-text">Lipid profile</span> is ready, and ${outOfRange.length} results are worth discussing with your doctor.</h2>
+        </div>
+        <div class="hello-actions">
+          <button class="btn btn-ghost" data-nav="trends">${ico('trend')}See trends</button>
+          <button class="btn btn-solid" data-nav="reports">${ico('doc')}Open reports</button>
+        </div>
+        <div class="hello-tube" aria-hidden="true"><span class="ht-liquid"></span><span class="ht-cap"></span></div>
+      </section>`;
+
+    const kpis = kpiRow([
+      { label: 'Reports ready',      value: String(ready),      icon: 'doc',      nav: 'reports', trend: { text: '2 new' }, note: 'Latest on 2 Oct' },
+      { label: 'Samples in the lab', value: String(inLab.length), icon: 'flask',  nav: 'samples', color: '#2563eb', note: 'Next report around 2 PM' },
+      { label: 'Next appointment',   value: 'Tue 7 Oct', count: false, icon: 'calendar', nav: 'book', color: '#8b5cf6', note: '07:30 · home collection' },
+      { label: 'Outside normal range', value: String(outOfRange.length), icon: 'alert', nav: 'alerts', color: '#e11d48', trend: { text: 'Discuss', good: false }, note: outOfRange.map(r => r.name).join(', ') }
+    ]);
+
+    const s = samples[0];
+    const tracker = `<div class="track-meta">
+        <div><span class="lbl">Sample</span><b class="mono">${s.id}</b></div>
+        <div><span class="lbl">Test</span><b>${s.test}</b></div>
+        <div><span class="lbl">Expected</span><b>${s.eta}</b></div>
+      </div>
+      ${stepper(s)}
+      <button class="link-btn" data-nav="samples">Track all samples →</button>`;
+
+    const results = `<ul class="res-list">${latest.map(resultRow).join('')}</ul>`;
+
+    const bookingList = bookings.map(b => `
+      <li class="book-row row-anim" onclick="go404()">
+        <span class="book-date">${ico(b.where.startsWith('Home') ? 'home' : 'pin')}</span>
+        <span class="book-main">
+          <span class="book-title">${b.title} · ${b.tests}</span>
+          <span class="book-sub">${b.when}</span>
+          <span class="book-sub">${b.where}${b.fasting ? ' · <b class="fast">Fasting needed</b>' : ''}</span>
+        </span>
+      </li>`).join('');
+    const prep = `<ul class="prep">${prepTips.map(t => `<li class="row-anim">${ico('check', 'prep-ico')}<span>${t}</span></li>`).join('')}</ul>`;
+
+    const noteList = notes.slice(0, 3).map(noteRow).join('');
+
+    return `${hello}${kpis}
+      <div class="grid grid-a">
+        ${card({ title: 'HbA1c trend', sub: 'Your 3-month sugar, last 8 months', icon: 'trend', cls: 'span-2', aside: `<button class="link-btn" data-nav="trends">All markers →</button>` }, trendChart('HbA1c', true))}
+        ${card({ title: 'Sample tracker', sub: 'Live status of your latest sample', icon: 'flask' }, tracker)}
+      </div>
+      <div class="grid grid-b">
+        ${card({ title: 'Latest results', sub: 'Green band = normal range', icon: 'pulse', aside: `<button class="link-btn" data-nav="reports">All reports →</button>` }, results)}
+        ${card({ title: 'Upcoming bookings', sub: 'Collections and visits', icon: 'calendar' }, `<ul class="book-list">${bookingList}</ul><p class="sub-head">Before Tuesday’s fasting test</p>${prep}`)}
+      </div>
+      ${card({ title: 'Notifications', sub: 'Most recent first', icon: 'bell', aside: `<button class="link-btn" data-nav="alerts">All notifications →</button>` }, `<ul class="note-list">${noteList}</ul>`)}`;
+  }
+
+  function noteRow(n) {
+    return `<li class="note note-${n.level} row-anim" onclick="go404()">
+      <span class="note-ico">${ico(levelIcon[n.level])}</span>
+      <span class="note-main"><span class="note-text">${n.text}</span><span class="note-sub">${n.meta} · ${n.time}</span></span>
+      <span class="note-level">${n.level}</span>
+    </li>`;
+  }
+
+  /* =========================================================
+     REPORTS
+     ========================================================= */
+  function renderReports() {
+    const list = state.reportCat === 'All' ? reports : reports.filter(r => r.cat === state.reportCat);
+    const kpis = kpiRow([
+      { label: 'Total reports',  value: String(reports.length), icon: 'doc' },
+      { label: 'Ready',          value: String(reports.filter(r => r.status === 'Ready').length), icon: 'check', color: '#10b981' },
+      { label: 'Processing',     value: String(reports.filter(r => r.status === 'Processing').length), icon: 'clock', color: '#d97706', note: 'Vitamin D & B12' },
+      { label: 'Reports with flags', value: String(reports.filter(r => r.flags).length), icon: 'alert', color: '#e11d48', note: 'one or more values outside range' }
+    ]);
+    const rows = list.map(r => `
+      <article class="report row-anim" onclick="go404()">
+        <span class="report-ico" style="--c:${catColor[r.cat]}">${ico('doc')}</span>
+        <span class="report-main">
+          <span class="report-title">${r.test}</span>
+          <span class="report-sub"><span class="mono">${r.id}</span> · ${r.date} · ${r.doctor}</span>
+        </span>
+        <span class="report-tags">
+          <span class="tag" style="--c:${catColor[r.cat]}">${r.cat}</span>
+          ${r.flags ? `<span class="tag tag-out">${r.flags} outside range</span>` : ''}
+          <span class="state state-${r.status === 'Ready' ? 'good' : 'warn'}">${r.status}</span>
+        </span>
+        <span class="report-btns">
+          <button class="chip" onclick="event.stopPropagation();go404()" ${r.status !== 'Ready' ? 'disabled' : ''}>View</button>
+          <button class="chip chip-icon" onclick="event.stopPropagation();go404()" aria-label="Download ${r.test}" ${r.status !== 'Ready' ? 'disabled' : ''}>${ico('download', 'chip-ico')}</button>
+        </span>
+      </article>`).join('');
+    return `${kpis}${card({ title: 'Report library', sub: `${list.length} report${list.length === 1 ? '' : 's'} shown`, icon: 'doc', aside: chips(reportCats, state.reportCat, 'report-filter') },
+      `<div class="report-list">${rows || '<p class="empty">No reports in this category yet.</p>'}</div>`)}`;
+  }
+
+  /* =========================================================
+     SAMPLE TRACKING
+     ========================================================= */
+  function renderSamples() {
+    const kpis = kpiRow([
+      { label: 'Samples in the lab', value: String(samples.filter(s => s.stage < 4).length), icon: 'flask' },
+      { label: 'Delivered this month', value: '5', icon: 'check', color: '#10b981' },
+      { label: 'Average turnaround', value: '14 h', icon: 'clock', color: '#2563eb', note: 'from collection to report' },
+      { label: 'Home collections', value: '3', icon: 'home', color: '#8b5cf6', note: 'free above ₹999' }
+    ]);
+    const cards = samples.map(s => card({
+      title: s.test, sub: `${s.id} · ${s.tube}`, icon: 'flask', cls: 'sample-card',
+      aside: `<span class="state state-${s.stage === 4 ? 'good' : 'info'}">${s.stage === 4 ? 'Report ready' : SAMPLE_STEPS[s.stage]}</span>`
+    }, `<div class="track-meta">
+        <div><span class="lbl">Collected</span><b>${s.collected}</b></div>
+        <div><span class="lbl">Where</span><b>${s.where}</b></div>
+        <div><span class="lbl">${s.stage === 4 ? 'Status' : 'Expected'}</span><b>${s.eta}</b></div>
+      </div>${stepper(s)}`)).join('');
+    return `${kpis}<div class="grid grid-1">${cards}</div>`;
+  }
+
+  /* =========================================================
+     HEALTH TRENDS
+     ========================================================= */
+  function renderTrends() {
+    const m = markers[state.marker];
+    const first = m.data[0], last = m.data[m.data.length - 1];
+    const change = last - first;
+    const inRange = m.data.filter(v => v >= m.lo && v <= m.hi).length;
+    const towardRange = (last > m.hi && change < 0) || (last < m.lo && change > 0) || (last >= m.lo && last <= m.hi);
+    const kpis = kpiRow([
+      { label: 'Latest value', value: `${last.toFixed(m.dec)} ${m.unit}`, icon: 'pulse', color: m.color },
+      { label: `Change since ${trendMonths[0]}`, value: `${change > 0 ? '+' : ''}${change.toFixed(m.dec)}`, count: false, icon: 'trend', color: towardRange ? '#10b981' : '#e11d48', trend: { text: towardRange ? 'Improving' : 'Watch', good: towardRange } },
+      { label: 'Readings in range', value: `${inRange}/${m.data.length}`, count: false, icon: 'check', color: '#0d9488', bar: inRange / m.data.length * 100 },
+      { label: 'Normal range', value: `${m.lo}–${m.hi}`, count: false, icon: 'shield', color: '#8b5cf6', note: m.unit }
+    ]);
+    const table = `<div class="table-wrap"><table class="table">
+      <thead><tr><th>Month</th><th>Value</th><th>Status</th></tr></thead>
+      <tbody>${m.data.map((v, i) => {
+        const out = v < m.lo || v > m.hi;
+        return `<tr class="row-anim"><td data-label="Month">${trendMonths[i]} 2026</td><td class="mono" data-label="Value">${v} ${m.unit}</td>
+          <td data-label="Status"><span class="flag ${out ? 'flag-out' : 'flag-ok'}">${out ? (v > m.hi ? 'High' : 'Low') : 'Normal'}</span></td></tr>`;
+      }).reverse().join('')}</tbody></table></div>`;
+    return `${kpis}
+      ${card({ title: state.marker, sub: 'Last 8 months · hover a point for the exact value', icon: 'trend', aside: chips(Object.keys(markers), state.marker, 'marker-filter') }, trendChart(state.marker))}
+      <div class="grid grid-b">
+        ${card({ title: 'All readings', sub: 'Newest first', icon: 'doc', cls: 'card-table' }, table)}
+        ${card({ title: 'About this marker', sub: 'In plain words', icon: 'info' }, `<p class="about">${m.about}</p><button class="chip" onclick="go404()">${ico('share', 'chip-ico')}Share trend with my doctor</button>`)}
+      </div>`;
+  }
+
+  /* =========================================================
+     BOOK A TEST — every word typed must match the test
+     ========================================================= */
+  function renderBook() {
+    const terms = state.testSearch.toLowerCase().split(/\s+/).filter(Boolean);
+    const list = tests.filter(t => (state.testCat === 'All' || t.cat === state.testCat) &&
+      terms.every(w => [t.name, t.cat].join(' ').toLowerCase().includes(w)));
+    const kpis = kpiRow([
+      { label: 'Tests on our menu', value: '1,200+', count: false, icon: 'flask' },
+      { label: 'Home collection', value: 'Free', count: false, icon: 'home', color: '#10b981', note: 'on orders above ₹999' },
+      { label: 'Fastest report', value: '6 h', icon: 'clock', color: '#2563eb', note: 'Complete blood count' },
+      { label: 'Centres in Salem', value: '3', icon: 'pin', color: '#8b5cf6', note: 'open 6:30 AM – 9 PM' }
+    ]);
+    const cards = list.map(t => {
+      const off = Math.round((1 - t.price / t.mrp) * 100);
+      return `<article class="test row-anim">
+        <header>
+          <span class="tag" style="--c:${catColor[t.cat]}">${t.cat}</span>
+          ${t.popular ? `<span class="tag tag-pop">Popular</span>` : ''}
+        </header>
+        <h3 class="test-name">${t.name}</h3>
+        <ul class="test-facts">
+          <li>${ico('flask', 'fact-ico')}${t.params} parameter${t.params === 1 ? '' : 's'}</li>
+          <li>${ico('clock', 'fact-ico')}Report in ${t.tat}</li>
+          <li>${ico('drop', 'fact-ico')}${t.fasting ? 'Fasting needed' : 'No fasting'}</li>
+        </ul>
+        <footer>
+          <span class="price"><b>${rupees(t.price)}</b><s>${rupees(t.mrp)}</s><em>${off}% off</em></span>
+          <button class="btn btn-solid btn-sm" onclick="go404()">${ico('plus')}Book</button>
+        </footer>
+      </article>`;
+    }).join('');
+    return `${kpis}${card({ title: 'Tests & packages', sub: terms.length || state.testCat !== 'All' ? `Showing ${list.length} of ${tests.length}` : 'Prices include sample collection', icon: 'cart',
+        aside: `<label class="finder finder-inline">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>
+          <input id="test-search-input" placeholder="Search tests, e.g. thyroid" aria-label="Search tests" value="${esc(state.testSearch)}">
+        </label>` },
+      `${chips(testCats, state.testCat, 'test-filter')}<div class="test-grid">${cards || '<p class="empty">No tests match that search.</p>'}</div>`)}`;
+  }
+
+  /* =========================================================
+     BILLING
+     ========================================================= */
+  function renderBilling() {
+    const paid = invoices.filter(i => i.status === 'Paid').reduce((a, i) => a + i.amount, 0);
+    const due = invoices.filter(i => i.status === 'Due').reduce((a, i) => a + i.amount, 0);
+    const kpis = kpiRow([
+      { label: 'Paid this year', value: rupees(paid), icon: 'rupee' },
+      { label: 'Amount due', value: rupees(due), icon: 'clock', color: '#d97706', note: 'INV-3370 · Vitamin D & B12' },
+      { label: 'Invoices', value: String(invoices.length), icon: 'receipt', color: '#2563eb' },
+      { label: 'Saved with offers', value: rupees(3651), icon: 'check', color: '#10b981', note: 'vs listed prices' }
+    ]);
+    const rows = invoices.map(i => `
+      <tr class="row-anim" onclick="go404()">
+        <td class="mono" data-label="Invoice">${i.id}</td>
+        <td class="stack" data-label="Tests"><span class="t-name">${i.desc}</span></td>
+        <td data-label="Date">${i.date}</td>
+        <td class="num" data-label="Amount">${rupees(i.amount)}</td>
+        <td data-label="Paid by">${i.method}</td>
+        <td data-label="Status"><span class="state state-${invStatus[i.status]}">${i.status}</span></td>
+        <td data-label=""><button class="chip ${i.status === 'Due' ? 'chip-solid' : ''}" onclick="event.stopPropagation();go404()">${i.status === 'Due' ? 'Pay now' : 'Receipt'}</button></td>
+      </tr>`).join('');
+    return `${kpis}${card({ title: 'Invoices', sub: 'Newest first', icon: 'receipt', cls: 'card-table' },
+      `<div class="table-wrap"><table class="table">
+        <thead><tr><th>Invoice</th><th>Tests</th><th>Date</th><th>Amount</th><th>Paid by</th><th>Status</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`)}`;
+  }
+
+  /* =========================================================
+     NOTIFICATIONS
+     ========================================================= */
+  function renderAlerts() {
+    const kpis = kpiRow([
+      { label: 'Notifications', value: String(notes.length), icon: 'bell' },
+      { label: 'To discuss with doctor', value: String(notes.filter(n => n.level === 'attention').length), icon: 'alert', color: '#e11d48' },
+      { label: 'Reminders', value: String(notes.filter(n => n.level === 'reminder').length), icon: 'clock', color: '#d97706' },
+      { label: 'Updates', value: String(notes.filter(n => n.level === 'update').length), icon: 'info', color: '#2563eb' }
+    ]);
+    return `${kpis}${card({ title: 'All notifications', sub: 'Results to discuss first, then reminders and updates', icon: 'bell' }, `<ul class="note-list">${notes.map(noteRow).join('')}</ul>`)}`;
+  }
+
+  /* =========================================================
+     SETTINGS
+     ========================================================= */
+  function switchHtml(id, value) {
+    return `<span class="switch ${value ? 'on' : ''}" data-toggle="${id}" role="switch" aria-checked="${value}" tabindex="0"><span class="switch-knob"></span></span>`;
+  }
+  function selectHtml(id, options, value) {
+    return `<select class="pref-select" id="${id}">${options.map(o => `<option ${value === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+  }
+  function renderSettings() {
+    const s = state.settings;
+    const displayName = currentUsername || 'Signed out';
+    const displayEmail = currentEmail || 'No account signed in';
+    return `<div class="grid grid-settings">
+      ${card({ title: 'Account', sub: 'The profile signed in on this device', icon: 'users' },
+        `<div class="account">
+          <span class="avatar lg">${currentInitial}</span>
+          <div>
+            <span class="account-name">${esc(displayName)}</span>
+            <span class="account-email">${esc(displayEmail)}</span>
+            <span class="account-role">${currentRole} · ID PT-10482</span>
+          </div>
+        </div>
+        <div class="chip-row"><button class="chip" onclick="go404()">Edit profile</button><button class="chip" onclick="go404()">Family members</button></div>`)}
+
+      ${card({ title: 'Preferences', sub: 'Report delivery and reminders', icon: 'gear' },
+        `<div class="pref"><div><span class="pref-title">SMS when a report is ready</span><span class="pref-desc">A text with a secure link to your report</span></div>${switchHtml('smsReady', s.smsReady)}</div>
+        <div class="pref"><div><span class="pref-title">Email PDF reports</span><span class="pref-desc">Signed PDF sent to your inbox</span></div>${switchHtml('emailPdf', s.emailPdf)}</div>
+        <div class="pref"><div><span class="pref-title">Share reports with my doctor</span><span class="pref-desc">Dr. Meera Iyer gets a copy automatically</span></div>${switchHtml('shareDoctor', s.shareDoctor)}</div>
+        <div class="pref"><div><span class="pref-title">Fasting reminders</span><span class="pref-desc">The evening before a fasting test</span></div>${switchHtml('fastingReminders', s.fastingReminders)}</div>
+        <div class="pref"><div><span class="pref-title">Result units</span><span class="pref-desc">How glucose and cholesterol are shown</span></div>${selectHtml('units-select', ['Conventional (mg/dL)', 'SI (mmol/L)'], s.units)}</div>
+        <div class="pref pref-last"><div><span class="pref-title">Language</span><span class="pref-desc">Interface display language</span></div>${selectHtml('lang-select', ['English', 'Tamil', 'Telugu', 'Hindi'], s.language)}</div>`)}
+
+      ${card({ title: 'Session', sub: 'Sign out of this account on this device', icon: 'clock' },
+        `<div class="session"><p>Signed in as <strong>${esc(displayEmail)}</strong>. Signing out clears the session and returns you to the sign-in screen.</p>
+        <button class="chip chip-danger" id="settings-logout-btn">Sign out</button></div>`)}
+
+      ${card({ title: 'Privacy & data', sub: 'These cannot be undone', icon: 'shield' },
+        `<div class="danger-row"><button class="chip" onclick="go404()">Download my data</button><button class="chip chip-danger" onclick="go404()">Reset password</button><button class="chip chip-danger" onclick="go404()">Delete account</button></div>`)}
+    </div>`;
+  }
+
+  const pageRenderers = {
+    dashboard: renderDashboard, reports: renderReports, samples: renderSamples, trends: renderTrends,
+    book: renderBook, billing: renderBilling, alerts: renderAlerts, settings: renderSettings
+  };
+
+  /* =========================================================
+     MOTION (GSAP) — everything is visible without it
+     ========================================================= */
+  function setBarsNow() {
+    document.querySelectorAll('[data-w]').forEach(el => el.style.width = el.dataset.w + '%');
+  }
+  function countUp(el) {
+    const raw = el.textContent.trim();
+    const m = raw.match(/^([^\d]*)([\d,]+\.?\d*)(.*)$/);
+    if (!m) return;
+    const prefix = m[1], numStr = m[2].replace(/,/g, ''), suffix = m[3];
+    const target = parseFloat(numStr);
+    const decimals = numStr.includes('.') ? numStr.split('.')[1].length : 0;
+    const o = { v: 0 };
+    gsap.to(o, { v: target, duration: 1.1, ease: 'power2.out',
+      onUpdate: () => { el.textContent = prefix + (decimals ? o.v.toFixed(decimals) : fmt(Math.round(o.v))) + suffix; },
+      onComplete: () => { el.textContent = raw; } });
+  }
+  function animateRows() {
+    if (!ANIM) return;
+    gsap.from('#content-area .row-anim', { y: 12, opacity: 0, duration: .45, stagger: .035, ease: 'power2.out', clearProps: 'transform,opacity' });
+  }
+  function animatePage() {
+    setBarsNow();
+    if (!ANIM) return;
+    const area = '#content-area';
+    gsap.from('#page-head > *', { y: 14, opacity: 0, duration: .5, stagger: .07, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from(`${area} .anim`, { y: 26, opacity: 0, duration: .65, stagger: .07, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from(`${area} .row-anim`, { x: -12, opacity: 0, duration: .45, stagger: .03, delay: .25, ease: 'power2.out', clearProps: 'transform,opacity' });
+    gsap.fromTo(`${area} [data-w]`, { width: 0 }, { width: (i, el) => el.dataset.w + '%', duration: 1.1, delay: .3, ease: 'power3.out', stagger: .04 });
+    document.querySelectorAll(`${area} .rbar-mark`).forEach((el, i) => {
+      gsap.fromTo(el, { left: '0%' }, { left: el.dataset.left + '%', duration: 1.1, delay: .35 + i * .05, ease: 'expo.out' });
+    });
+    document.querySelectorAll(`${area} .tc-line`).forEach(line => {
+      const len = line.getTotalLength ? line.getTotalLength() : 1200;
+      gsap.fromTo(line, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.4, delay: .3, ease: 'power2.out', clearProps: 'strokeDasharray,strokeDashoffset' });
+    });
+    gsap.from(`${area} .tc-area`, { opacity: 0, duration: .8, delay: 1 });
+    gsap.from(`${area} .tc-dot`, { scale: 0, duration: .4, stagger: .06, delay: .6, ease: 'back.out(3)', clearProps: 'transform' });
+    gsap.from(`${area} .tc-band`, { scaleY: 0, transformOrigin: '50% 100%', duration: .8, delay: .2, ease: 'power2.out', clearProps: 'transform' });
+    document.querySelectorAll(`${area} [data-count]`).forEach(countUp);
+    const tube = document.querySelector(`${area} .ht-liquid`);
+    if (tube) gsap.fromTo(tube, { height: '0%' }, { height: '62%', duration: 1.6, delay: .4, ease: 'power2.inOut' });
+  }
+
+  /* background: bands slowly migrate down their gel lanes */
+  (function gel() {
+    const box = document.getElementById('bgBands');
+    const colors = ['rgba(13,148,136,.22)', 'rgba(37,99,235,.18)', 'rgba(139,92,246,.18)', 'rgba(13,148,136,.14)'];
+    const lanes = Math.ceil(window.innerWidth / 64) + 1;
+    let html = '';
+    for (let l = 0; l < lanes; l++) {
+      const n = 2 + (l % 3);
+      for (let b = 0; b < n; b++) {
+        html += `<i style="left:${l * 64 + 12}px;top:${(b * 31 + l * 17) % 100}%;width:40px;height:${4 + (b + l) % 5}px;background:${colors[(l + b) % colors.length]}"></i>`;
+      }
+    }
+    box.innerHTML = html;
+    if (!ANIM) return;
+    box.querySelectorAll('i').forEach(band => {
+      gsap.to(band, { y: '+=' + (60 + Math.random() * 120), opacity: .35, duration: 8 + Math.random() * 10, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: Math.random() * 4 });
+    });
+  })();
+
+  /* =========================================================
+     SHELL
+     ========================================================= */
+  function renderNav() {
+    document.getElementById('nav-drawer').innerHTML = Object.keys(navGroups).map(g => `
+      <p class="dock-label">${groupLabels[g]}</p>
+      <nav class="dock-nav">${navGroups[g].map(i => {
+        const n = i.badge ? i.badge() : 0;
+        return `<button class="dock-item ${state.activeNav === i.id ? 'on' : ''}" data-nav="${i.id}" ${state.activeNav === i.id ? 'aria-current="page"' : ''}>${ico(i.icon, 'dock-ico')}<span class="dock-text">${i.label}</span>${n ? `<span class="nav-badge">${n}</span>` : ''}</button>`;
+      }).join('')}</nav>`).join('');
+  }
+
+  function renderPage(animate) {
+    const page = pageMap[state.activeNav];
+    const group = Object.keys(navGroups).find(g => navGroups[g].some(i => i.id === state.activeNav));
+    document.getElementById('page-title-text').textContent = page.title;
+    document.getElementById('page-sub-text').textContent = page.sub;
+    document.getElementById('page-kicker').textContent = groupLabels[group] || '';
+    document.getElementById('page-actions').innerHTML = pageActions[state.activeNav] || '';
+    document.title = page.title + ' – Diagnostic Laboratory';
+    const content = document.getElementById('content-area');
+    content.innerHTML = pageRenderers[state.activeNav]();
+    renderNav();
+    const sBtn = document.getElementById('settings-logout-btn');
+    if (sBtn) sBtn.addEventListener('click', logout);
+    if (animate !== false) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      animatePage();
+    } else {
+      setBarsNow();
+    }
+  }
+
+  function navigateTo(id) {
+    if (!pageMap[id]) return;
+    state.activeNav = id;
+    writeStore('activeNav', id);
+    closeDrawer();
+    closeWhoami();
+    renderPage();
+  }
+
+  /* ---- sidebar: fixed on desktop, drawer at 1100px and below ---- */
+  const MENU_BREAK = 1100;
+  const sidebar = document.getElementById('sidebar');
+  const scrim = document.getElementById('scrim');
+  const burger = document.getElementById('hamburger-btn');
+
+  function openDrawer() {
+    sidebar.classList.add('open');
+    scrim.classList.add('show');
+    burger.classList.add('is-open');
+    burger.setAttribute('aria-expanded', 'true');
+    burger.setAttribute('aria-label', 'Close menu');
+    sidebar.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('nav-open');
+    if (ANIM) gsap.from('#nav-drawer .dock-item', { x: -16, opacity: 0, duration: .35, stagger: .03, delay: .1, clearProps: 'transform,opacity' });
+  }
+  function closeDrawer() {
+    if (!sidebar.classList.contains('open')) return;
+    sidebar.classList.remove('open');
+    scrim.classList.remove('show');
+    burger.classList.remove('is-open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'Open menu');
+    document.body.classList.remove('nav-open');
+    syncDock();
+  }
+  function syncDock() {
+    const fixed = window.innerWidth > MENU_BREAK;
+    if (fixed) closeDrawer();
+    sidebar.setAttribute('aria-hidden', fixed || sidebar.classList.contains('open') ? 'false' : 'true');
+  }
+  burger.addEventListener('click', () => sidebar.classList.contains('open') ? closeDrawer() : openDrawer());
+  document.getElementById('dock-close').addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  window.addEventListener('resize', syncDock);
+  syncDock();
+
+  /* ---- user menu ---- */
+  const whoami = document.getElementById('topbar-user');
+  const whoamiBtn = document.getElementById('topbar-user-btn');
+  function closeWhoami() { whoami.classList.remove('open'); whoamiBtn.setAttribute('aria-expanded', 'false'); }
+  whoamiBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = whoami.classList.toggle('open');
+    whoamiBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', e => { if (!whoami.contains(e.target)) closeWhoami(); });
+
+  document.getElementById('notif-btn').addEventListener('click', () => navigateTo('alerts'));
+  document.getElementById('logout-btn').addEventListener('click', logout);
+  document.getElementById('topbar-logout-btn').addEventListener('click', logout);
+
+  /* ---- top bar search: on phones the magnifier opens the field first ---- */
+  const finder = document.getElementById('topbar-search');
+  const finderInput = document.getElementById('topbar-search-input');
+  function openFinder() { finder.classList.add('expanded'); finderInput.focus(); }
+  finder.addEventListener('submit', e => {
+    e.preventDefault();
+    if (window.innerWidth <= 720 && !finder.classList.contains('expanded')) { openFinder(); return; }
+    const q = finderInput.value.trim();
+    if (!q) { finderInput.focus(); return; }
+    // a test name jumps straight into "Book a test" with the search filled in
+    state.testSearch = q; state.testCat = 'All';
+    finderInput.value = ''; finder.classList.remove('expanded'); finderInput.blur();
+    navigateTo('book');
+  });
+  finderInput.addEventListener('blur', () => { if (!finderInput.value.trim()) finder.classList.remove('expanded'); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeDrawer(); closeWhoami(); finderInput.blur(); }
+    const typing = e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
+    if (e.key === '/' && !typing) { e.preventDefault(); openFinder(); }
+  });
+
+  /* ---- chart tooltip ---- */
+  const tip = document.getElementById('chart-tip');
+  function showTip(el) {
+    tip.textContent = el.getAttribute('data-tip');
+    tip.classList.add('show');
+    const r = el.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    let x = r.left + r.width / 2 - w / 2;
+    x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+    tip.style.left = x + 'px';
+    tip.style.top = Math.max(8, r.top - tip.offsetHeight - 10) + 'px';
+  }
+  function hideTip() { tip.classList.remove('show'); }
+  document.addEventListener('mouseover', e => { const t = e.target.closest('[data-tip]'); if (t) showTip(t); });
+  document.addEventListener('mouseout', e => { if (e.target.closest('[data-tip]')) hideTip(); });
+  document.addEventListener('focusin', e => { const t = e.target.closest && e.target.closest('[data-tip]'); if (t) showTip(t); });
+  document.addEventListener('focusout', hideTip);
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  /* ---- delegated clicks ---- */
+  document.addEventListener('click', e => {
+    const navBtn = e.target.closest('[data-nav]');
+    if (navBtn) { navigateTo(navBtn.getAttribute('data-nav')); return; }
+    const rf = e.target.closest('.report-filter');
+    if (rf) { state.reportCat = rf.dataset.filter; renderPage(false); animateRows(); return; }
+    const tf = e.target.closest('.test-filter');
+    if (tf) { state.testCat = tf.dataset.filter; renderPage(false); animateRows(); return; }
+    const mf = e.target.closest('.marker-filter');
+    if (mf) { state.marker = mf.dataset.filter; renderPage(false); animatePage(); return; }
+    const toggle = e.target.closest('[data-toggle]');
+    if (toggle) { flipSwitch(toggle); return; }
+  });
+  document.addEventListener('keydown', e => {
+    const toggle = e.target.closest && e.target.closest('[data-toggle]');
+    if (toggle && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); flipSwitch(toggle); }
+  });
+  function flipSwitch(toggle) {
+    const key = toggle.dataset.toggle;
+    state.settings[key] = !state.settings[key];
+    saveSettings();
+    toggle.classList.toggle('on', state.settings[key]);
+    toggle.setAttribute('aria-checked', String(state.settings[key]));
+  }
+
+  document.addEventListener('input', e => {
+    if (e.target && e.target.id === 'test-search-input') {
+      state.testSearch = e.target.value;
+      const caret = e.target.selectionStart;
+      renderPage(false);
+      const input = document.getElementById('test-search-input');
+      if (input) { input.focus(); input.setSelectionRange(caret, caret); }
+    }
+  });
+  document.addEventListener('change', e => {
+    if (!e.target) return;
+    if (e.target.id === 'lang-select')  { state.settings.language = e.target.value; saveSettings(); }
+    if (e.target.id === 'units-select') { state.settings.units = e.target.value; saveSettings(); }
+  });
+
+  /* ---- boot ---- */
+  paintUserChrome();
+  renderPage();
+  if (ANIM) {
+    // the drawer's off-screen position is a CSS transform, so only animate the fixed desktop sidebar
+    if (window.innerWidth > MENU_BREAK) gsap.from('.dock', { x: -30, opacity: 0, duration: .7, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from('.head', { y: -20, opacity: 0, duration: .6, ease: 'power3.out', clearProps: 'transform,opacity' });
+  }
+  </script>
+</body>
+</html>

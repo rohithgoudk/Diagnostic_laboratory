@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account – Diagnostic Laboratory</title>
+  <meta name="description" content="Create your account to book tests, track samples and download verified reports.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/signup.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body>
+
+  <!-- ========== Background: microscope field with drifting blood cells + pipette ========== -->
+  <div class="bg" aria-hidden="true">
+    <canvas class="bg-cells" id="cellCanvas"></canvas>
+    <div class="bg-lens"></div>
+    <div class="bg-glow bg-glow--one"></div>
+    <div class="bg-glow bg-glow--two"></div>
+
+    <div class="pipette" id="pipette">
+      <svg viewBox="0 0 60 220">
+        <rect class="pip-bulb" x="14" y="0" width="32" height="54" rx="16"/>
+        <rect class="pip-collar" x="10" y="50" width="40" height="12" rx="4"/>
+        <path class="pip-glass" d="M20 62 H40 V150 L32 196 H28 L20 150 Z"/>
+        <path class="pip-fluid" d="M22 120 H38 V150 L31 192 H29 L22 150 Z"/>
+        <path class="pip-ticks" d="M34 74h6M36 86h4M34 98h6M36 110h4"/>
+      </svg>
+      <span class="drop" id="drop"></span>
+    </div>
+    <div class="well" id="well"><span class="ripple"></span><span class="ripple"></span></div>
+  </div>
+
+  <!-- ========== Top bar ========== -->
+  <header class="topbar">
+    <a href="index.html" class="back-home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      <span>Back to home</span>
+    </a>
+    <span class="status-pill"><span class="pulse"></span>Registration open</span>
+  </header>
+
+  <main class="signup-layout">
+
+    <!-- ========== Left: showcase ========== -->
+    <section class="showcase" aria-hidden="true">
+      <p class="showcase__tag"><span class="tag-dot"></span>Set up in 2 minutes</p>
+      <h2 class="showcase__title">Every report, <span class="grad-text">one secure place.</span></h2>
+      <p class="showcase__text">Create your account to book tests, follow your sample through the lab and download signed reports.</p>
+
+      <ol class="steps">
+        <li class="step">
+          <span class="step__ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15l2.5 2.5L16 13"/></svg></span>
+          <div><span class="step__title">Book a test</span><span class="step__text">Home collection or walk in at any of our centres.</span></div>
+        </li>
+        <li class="step">
+          <span class="step__ico"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-2.5L14 9V3"/><path d="M7 15h10"/></svg></span>
+          <div><span class="step__title">Track your sample</span><span class="step__text">Live status from collection to analysis.</span></div>
+        </li>
+        <li class="step">
+          <span class="step__ico"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13l2 2 4-4"/></svg></span>
+          <div><span class="step__title">Get verified results</span><span class="step__text">Pathologist-signed PDF reports, shareable with your doctor.</span></div>
+        </li>
+      </ol>
+
+      <!-- Specimen label -->
+      <div class="label-card">
+        <div class="label-card__head">
+          <span class="label-card__title">Specimen label</span>
+          <span class="label-card__tube"><i></i>EDTA · Lavender</span>
+        </div>
+        <div class="label-card__body">
+          <div class="barcode" id="barcode"></div>
+          <dl class="label-meta">
+            <div><dt>Sample ID</dt><dd>LB-24817</dd></div>
+            <div><dt>Test</dt><dd>CBC + Lipid</dd></div>
+            <div><dt>Collected</dt><dd>08:12</dd></div>
+          </dl>
+        </div>
+        <div class="toast">
+          <span class="toast__ico"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span><b>Report ready</b><em>Signed by Dr. Meera · 13:58</em></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Right: sign-up card ========== -->
+    <section class="card-wrap">
+      <div class="card" id="card">
+
+        <!-- progress bar: fills as the form is completed -->
+        <span class="card-progress" aria-hidden="true"><span class="card-progress__fill" id="progressFill"></span></span>
+
+        <a href="index.html" class="logo" aria-label="Go to homepage">
+          <img src="../assets/Logo.webp" alt="Company logo">
+        </a>
+
+        <p class="kicker"><span class="kicker__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c1.2-3.4 4.2-5 6.5-5s5.3 1.6 6.5 5"/><path d="M19 8v6M22 11h-6"/></svg></span>New account</p>
+        <h1 class="card__title">Create your account</h1>
+        <p class="card__sub">Already registered? <a href="login.html">Sign in</a></p>
+
+        <!-- Role toggle -->
+        <div class="role-toggle" id="roleToggle" role="tablist" aria-label="Account type">
+          <span class="role-ind" id="roleInd"></span>
+          <button type="button" class="role-btn active" data-role="user" role="tab" aria-selected="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+            User sign up
+          </button>
+          <button type="button" class="role-btn" data-role="admin" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M12 9v6M9 12h6"/></svg>
+            Admin sign up
+          </button>
+        </div>
+        <p class="role-note" id="roleNote">A user account lets you book tests, track samples and download your reports.</p>
+
+        <form class="form" id="signupForm" novalidate>
+
+          <div class="form-row">
+            <div class="field" id="f-first">
+              <label for="firstName">First name</label>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+                <input type="text" id="firstName" placeholder="Jordan" autocomplete="given-name">
+              </div>
+              <span class="field-error">Letters only, at least 2.</span>
+            </div>
+            <div class="field" id="f-last">
+              <label for="lastName">Last name</label>
+              <div class="input-wrap">
+                <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+                <input type="text" id="lastName" placeholder="Reyes" autocomplete="family-name">
+              </div>
+              <span class="field-error">Letters only, at least 2.</span>
+            </div>
+          </div>
+
+          <div class="field" id="f-email">
+            <label for="email">Email address</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+              <input type="email" id="email" placeholder="name@example.com" autocomplete="email">
+            </div>
+            <span class="field-error">Enter a valid email address.</span>
+          </div>
+
+          <div class="field" id="f-company">
+            <label for="company">Clinic or organisation</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V7l8-4 8 4v14"/><path d="M10 21v-5h4v5M12 8v4M10 10h4"/></svg>
+              <input type="text" id="company" placeholder="Clinic, hospital or company" autocomplete="organization">
+            </div>
+            <span class="field-error">Tell us your clinic or organisation.</span>
+          </div>
+
+          <div class="field" id="f-password">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              <input type="password" id="password" class="pw-input" placeholder="Minimum 10 characters" autocomplete="new-password">
+              <!-- One custom toggle; the browser's built-in reveal icon is hidden in CSS -->
+              <button type="button" class="pw-toggle" data-target="password" aria-label="Show password" aria-pressed="false">
+                <svg class="eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.66 3.79"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+              </button>
+            </div>
+            <div class="strength" id="strength" data-level="0">
+              <span></span><span></span><span></span><span></span>
+              <em id="strengthText">Use 10+ characters with a mix of letters, numbers &amp; symbols</em>
+            </div>
+            <span class="field-error">Password must be at least 10 characters.</span>
+          </div>
+
+          <div class="field" id="f-confirm">
+            <label for="confirm">Confirm password</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              <input type="password" id="confirm" class="pw-input" placeholder="Re-enter your password" autocomplete="new-password">
+              <button type="button" class="pw-toggle" data-target="confirm" aria-label="Show password" aria-pressed="false">
+                <svg class="eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.66 3.79"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+              </button>
+            </div>
+            <span class="field-error">Passwords do not match.</span>
+          </div>
+
+          <!-- Only shown for an admin account -->
+          <div class="field admin-only" id="f-admin" hidden>
+            <label for="adminCode">Admin authorisation code</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+              <input type="text" id="adminCode" placeholder="Issued by your lab manager" autocomplete="off">
+            </div>
+            <span class="field-error">An authorisation code is required for an admin account.</span>
+          </div>
+
+          <div class="field" id="f-terms">
+            <label class="check">
+              <input type="checkbox" id="terms">
+              <span class="check__box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>I accept the <a href="404.html">terms of service</a> and <a href="404.html">privacy policy</a>.</span>
+            </label>
+            <span class="field-error">Accept the terms before creating your account.</span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span class="btn-submit__label" id="submitLabel">Create my account</span>
+            <svg class="btn-submit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <p class="card__foot">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+          Your health data is encrypted and never shared.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+    var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var ANIM = !!window.gsap && !REDUCED;
+    var $ = function (s, c) { return (c || document).querySelector(s); };
+    var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+    var role = 'user';
+
+    /* ---------- Specimen barcode (decorative) ---------- */
+    var bc = $('#barcode'), widths = [2,1,3,1,1,2,1,3,2,1,1,2,3,1,2,1,1,3,1,2,2,1,3,1,1,2,1,2,3,1,1,2,1,3,2,1];
+    bc.innerHTML = widths.map(function (w, i) { return '<i style="width:' + w + 'px;margin-right:' + ((i % 3) + 1) + 'px"></i>'; }).join('');
+
+    /* ---------- Role toggle ---------- */
+    var toggle = $('#roleToggle'), ind = $('#roleInd'), buttons = $$('.role-btn', toggle);
+    var note = $('#roleNote'), submitLabel = $('#submitLabel'), adminField = $('#f-admin');
+    var NOTES = {
+      user:  'A user account lets you book tests, track samples and download your reports.',
+      admin: 'An admin account manages lab staff, test menus, sample workflows and report sign-off.'
+    };
+
+    function placeIndicator() {
+      var active = $('.role-btn.active', toggle);
+      ind.style.width = active.offsetWidth + 'px';
+      ind.style.transform = 'translateX(' + (active.offsetLeft - 4) + 'px)';
+    }
+    placeIndicator();
+    window.addEventListener('resize', placeIndicator);
+    window.addEventListener('load', placeIndicator);
+
+    function pop(el) { if (ANIM) gsap.fromTo(el, { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: .35, ease: 'power2.out' }); }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('active')) return;
+        buttons.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        role = btn.dataset.role;
+        placeIndicator();
+
+        note.textContent = NOTES[role];
+        submitLabel.textContent = role === 'admin' ? 'Create admin account' : 'Create my account';
+        pop(note); pop(submitLabel);
+
+        if (role === 'admin') {
+          adminField.hidden = false;
+          if (ANIM) gsap.fromTo(adminField, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: .45, ease: 'power3.out', clearProps: 'height' });
+        } else {
+          adminField.hidden = true;
+          $('#adminCode').value = '';
+          adminField.classList.remove('has-error');
+        }
+        updateProgress();
+      });
+    });
+
+    /* ---------- Show / hide password (one icon per field) ---------- */
+    $$('.pw-toggle').forEach(function (btn) {
+      var input = document.getElementById(btn.dataset.target);
+      btn.addEventListener('click', function () {
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.classList.toggle('is-showing', show);
+        btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        btn.setAttribute('aria-pressed', String(show));
+        input.focus();
+        var len = input.value.length;
+        try { input.setSelectionRange(len, len); } catch (e) {}
+      });
+    });
+
+    /* ---------- Password strength meter ----------
+       Score = kinds of characters used (lower, upper, number, symbol)
+             + bonus for length (14+ and 20+ characters).
+       Under 10 characters or very repetitive = Weak. */
+    var pw = $('#password'), strength = $('#strength'), strengthText = $('#strengthText');
+    var HINT = 'Use 10+ characters with a mix of letters, numbers & symbols';
+    var LABELS = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+
+    function rate(v) {
+      var kinds = { lower: /[a-z]/.test(v), upper: /[A-Z]/.test(v), number: /\d/.test(v), symbol: /[^A-Za-z0-9]/.test(v) };
+      var variety = Object.keys(kinds).filter(function (k) { return kinds[k]; }).length;
+      var unique = new Set(v.split('')).size;
+      if (v.length < 10) return { level: 1, tip: (10 - v.length) + ' more character' + (10 - v.length === 1 ? '' : 's') + ' needed' };
+      if (unique < 5) return { level: 1, tip: 'Too repetitive — use more different characters' };
+      var score = variety;
+      if (v.length >= 14) score++;
+      if (v.length >= 20) score++;
+      var level = Math.max(1, Math.min(4, score));
+      var tip = '';
+      if (level < 4) {
+        if (!kinds.upper) tip = 'add an uppercase letter';
+        else if (!kinds.number) tip = 'add a number';
+        else if (!kinds.symbol) tip = 'add a symbol (!@#$…)';
+        else if (!kinds.lower) tip = 'add a lowercase letter';
+        else tip = 'make it longer';
+        tip = 'Tip: ' + tip;
+      }
+      return { level: level, tip: tip };
+    }
+
+    pw.addEventListener('input', function () {
+      var v = pw.value;
+      if (!v) { strength.dataset.level = 0; strengthText.textContent = HINT; return; }
+      var r = rate(v);
+      strength.dataset.level = r.level;
+      strengthText.textContent = LABELS[r.level] + (r.tip ? ' · ' + r.tip : '');
+    });
+
+    /* ---------- Validation ---------- */
+    var F = {
+      'f-first':    { input: 'firstName', test: function (v) { return /^[A-Za-z\s'-]{2,}$/.test(v.trim()); } },
+      'f-last':     { input: 'lastName',  test: function (v) { return /^[A-Za-z\s'-]{2,}$/.test(v.trim()); } },
+      'f-email':    { input: 'email',     test: function (v) { return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/.test(v.trim()); } },
+      'f-company':  { input: 'company',   test: function (v) { return v.trim().length > 0; } },
+      'f-password': { input: 'password',  test: function (v) { return v.length >= 10; } },
+      'f-confirm':  { input: 'confirm',   test: function (v) { return v.length > 0 && v === pw.value; } },
+      'f-admin':    { input: 'adminCode', test: function (v) { return role !== 'admin' || v.trim().length >= 4; } }
+    };
+    var terms = $('#terms'), progressFill = $('#progressFill');
+
+    function activeIds() { return Object.keys(F).filter(function (id) { return id !== 'f-admin' || role === 'admin'; }); }
+    function isOk(id) { return F[id].test(document.getElementById(F[id].input).value); }
+    function flag(id, show) {
+      var el = document.getElementById(id);
+      el.classList.remove('has-error');
+      if (show) {
+        void el.offsetWidth;
+        el.classList.add('has-error');
+        if (ANIM) gsap.fromTo(el, { x: -8 }, { x: 0, duration: .5, ease: 'elastic.out(1, .3)' });
+      }
+    }
+    function updateProgress() {
+      var ids = activeIds(), done = 0;
+      ids.forEach(function (id) { if (isOk(id)) done++; });
+      if (terms.checked) done++;
+      progressFill.style.width = (done / (ids.length + 1) * 100) + '%';
+    }
+
+    Object.keys(F).forEach(function (id) {
+      document.getElementById(F[id].input).addEventListener('input', function () {
+        flag(id, false);
+        if (id === 'f-password') flag('f-confirm', false);
+        updateProgress();
+      });
+    });
+    terms.addEventListener('change', function () { flag('f-terms', false); updateProgress(); });
+    updateProgress();
+
+    /* ---------- Submit ---------- */
+    var form = $('#signupForm'), submitBtn = $('#submitBtn');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var ok = true;
+      activeIds().forEach(function (id) { if (!isOk(id)) { flag(id, true); ok = false; } });
+      if (!terms.checked) { flag('f-terms', true); ok = false; }
+      if (!ok) {
+        var first = form.querySelector('.has-error input');
+        if (first) first.focus({ preventScroll: true });
+        form.querySelector('.has-error').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'center' });
+        return;
+      }
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+      submitLabel.textContent = role === 'admin' ? 'Creating your admin account…' : 'Creating your account…';
+
+      // Demo-only: remember the role so the sign-in page can preselect it.
+      try { localStorage.setItem('signupRole', role); } catch (err) {}
+
+      setTimeout(function () {
+        submitBtn.classList.remove('loading');
+        submitBtn.classList.add('success');
+        submitLabel.textContent = 'Taking you to sign in…';
+        setTimeout(function () { window.location.href = 'login.html?role=' + role; }, 600);
+      }, 1200);
+    });
+
+    /* ---------- Microscope background: drifting blood cells on canvas ---------- */
+    var cv = $('#cellCanvas'), ctx = cv.getContext('2d'), cells = [], W = 0, H = 0, DPR = 1, raf = null;
+    function makeCells() {
+      var count = Math.round(Math.min(34, Math.max(12, (W * H) / 42000)));
+      cells = [];
+      for (var i = 0; i < count; i++) {
+        var r = Math.random(), type = r < .72 ? 'rbc' : (r < .86 ? 'wbc' : 'plt');
+        cells.push({
+          type: type,
+          x: Math.random() * W, y: Math.random() * H,
+          s: type === 'rbc' ? 14 + Math.random() * 12 : (type === 'wbc' ? 20 + Math.random() * 8 : 3 + Math.random() * 3),
+          a: Math.random() * Math.PI * 2,
+          vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25 + .08,
+          va: (Math.random() - .5) * .004
+        });
+      }
+    }
+    function size() {
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = W * DPR; cv.height = H * DPR;
+      cv.style.width = W + 'px'; cv.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      makeCells();
+    }
+    function drawCell(c) {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate(c.a);
+      if (c.type === 'rbc') {
+        ctx.scale(1, .82);
+        var g = ctx.createRadialGradient(0, 0, c.s * .15, 0, 0, c.s);
+        g.addColorStop(0, 'rgba(251, 207, 214, .55)');
+        g.addColorStop(.55, 'rgba(244, 114, 138, .32)');
+        g.addColorStop(1, 'rgba(225, 29, 72, .18)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0, 0, c.s, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(225, 29, 72, .22)'; ctx.lineWidth = 1.2; ctx.stroke();
+      } else if (c.type === 'wbc') {
+        ctx.fillStyle = 'rgba(219, 234, 254, .55)';
+        ctx.beginPath(); ctx.arc(0, 0, c.s, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(99, 102, 241, .28)'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.fillStyle = 'rgba(124, 58, 237, .35)';
+        [[-.32, -.18], [.22, -.28], [.05, .3]].forEach(function (p) {
+          ctx.beginPath(); ctx.arc(p[0] * c.s, p[1] * c.s, c.s * .3, 0, Math.PI * 2); ctx.fill();
+        });
+      } else {
+        ctx.fillStyle = 'rgba(167, 139, 250, .45)';
+        ctx.beginPath(); ctx.arc(0, 0, c.s, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      cells.forEach(function (c) {
+        c.x += c.vx; c.y += c.vy; c.a += c.va;
+        var m = c.s + 4;
+        if (c.x < -m) c.x = W + m; else if (c.x > W + m) c.x = -m;
+        if (c.y < -m) c.y = H + m; else if (c.y > H + m) c.y = -m;
+        drawCell(c);
+      });
+      raf = requestAnimationFrame(frame);
+    }
+    size();
+    if (REDUCED) { cells.forEach(drawCell); }
+    else { frame(); }
+    var rt;
+    window.addEventListener('resize', function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () { size(); if (REDUCED) cells.forEach(drawCell); }, 150);
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (REDUCED) return;
+      if (document.hidden) { cancelAnimationFrame(raf); raf = null; }
+      else if (!raf) frame();
+    });
+
+    if (!ANIM) return;
+
+    /* ---------- Intro timeline ---------- */
+    var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.topbar > *', { y: -24, opacity: 0, duration: .6, stagger: .1 })
+      .from('#card', { y: 50, opacity: 0, scale: .97, duration: .9 }, '-=.3')
+      .from('.card > :not(.card-progress)', { y: 18, opacity: 0, duration: .5, stagger: .05 }, '-=.6')
+      .from('.form > *', { y: 16, opacity: 0, duration: .45, stagger: .05 }, '-=.5')
+      .add(placeIndicator);
+
+    if (getComputedStyle($('.showcase')).display !== 'none') {
+      tl.from('.showcase > *', { x: -40, opacity: 0, duration: .8, stagger: .1 }, .2)
+        .from('.step', { x: -24, opacity: 0, duration: .5, stagger: .12 }, .8)
+        .from('.barcode i', { scaleY: 0, transformOrigin: '50% 100%', duration: .4, stagger: .015 }, 1.2)
+        .from('.toast', { y: 30, opacity: 0, scale: .9, duration: .7, ease: 'back.out(1.8)' }, 1.8);
+      gsap.to('.toast__ico', { scale: 1.15, duration: .7, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 2.6 });
+    }
+
+    /* ---------- Pipette drips into the sample well ---------- */
+    if (getComputedStyle($('#pipette')).display !== 'none') {
+      gsap.from('#pipette', { y: -200, opacity: 0, duration: 1.2, ease: 'power3.out', delay: .4 });
+      gsap.from('#well', { scale: .6, opacity: 0, duration: .8, ease: 'back.out(2)', delay: .7 });
+      var dripTl = gsap.timeline({ repeat: -1, repeatDelay: 1.6, delay: 1.8 });
+      dripTl.to('.pip-bulb', { scaleY: .82, transformOrigin: '50% 0%', duration: .35, ease: 'power2.in' })
+        .fromTo('#drop', { y: 0, scale: 0, opacity: 1 }, { scale: 1, duration: .25, ease: 'back.out(3)' }, '-=.1')
+        .to('.pip-bulb', { scaleY: 1, duration: .4, ease: 'power2.out' })
+        .to('#drop', { y: function () { return $('#well').getBoundingClientRect().top - $('#drop').getBoundingClientRect().top + 6; }, duration: .55, ease: 'power2.in' }, '-=.3')
+        .set('#drop', { opacity: 0 })
+        .fromTo('.ripple', { scale: .2, opacity: .8 }, { scale: 1.6, opacity: 0, duration: 1, stagger: .18, ease: 'power2.out' });
+    }
+
+    gsap.to('.tag-dot', { scale: 1.6, opacity: .4, duration: .8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+    gsap.to('.bg-lens', { scale: 1.06, duration: 6, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+  })();
+  </script>
+</body>
+</html>

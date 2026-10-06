@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About us — STACKLY Diagnostics</title>
+<meta name="description" content="The story, people and standards behind STACKLY Diagnostics — a NABL-accredited laboratory serving Salem since 2012.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/about.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body class="is-loading">
+
+<!-- ============ PRELOADER — a sample tube fills while the page loads ============ -->
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="pl-inner">
+    <div class="pl-tube"><span class="pl-cap"></span><span class="pl-liquid" id="plLiquid"></span></div>
+    <div class="pl-word"><span>S</span><span>T</span><span>A</span><span>C</span><span>K</span><span>L</span><span>Y</span></div>
+    <div class="pl-text">Loading our story <b id="plPct">0%</b></div>
+  </div>
+</div>
+
+<!-- ============ HEADER — transparent over the hero, turns solid on scroll ============ -->
+<header class="site-header" id="siteHeader">
+  <nav class="nav wrap">
+    <!-- Logo — replace src with your logo, e.g. ../assets/Logo.webp -->
+    <a href="index.html" class="logo" aria-label="Home">
+      <span class="logo-shine" aria-hidden="true"></span>
+      <img src="../assets/Logo.webp" alt="Company logo">
+    </a>
+
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="about.html" class="active" aria-current="page">About</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+      <span class="nav-line" id="navLine" aria-hidden="true"></span>
+    </div>
+
+    <div class="nav-right">
+      <a href="login.html" class="nav-login">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+        Login
+      </a>
+      <a href="signup.html" class="btn btn-primary btn-sm nav-signup">
+        <svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c1.2-3.4 4.2-5 6.5-5s5.3 1.6 6.5 5"/><path d="M19 8v6M22 11h-6"/></svg>
+        Sign Up
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="scroll-bar" id="scrollBar" aria-hidden="true"></div>
+</header>
+
+<!-- ============ MOBILE MENU — slides in from the right ============ -->
+<div class="menu-scrim" id="menuScrim"></div>
+<aside class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Menu">
+  <div class="mm-top">
+    <a href="index.html" class="logo logo--plate" aria-label="Home">
+      <img src="../assets/Logo.webp" alt="Company logo">
+    </a>
+    <button class="mm-close" id="mobileMenuClose" aria-label="Close menu">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav class="mm-links">
+    <a href="index.html"><em>01</em>Home</a>
+    <a href="services.html"><em>02</em>Services</a>
+    <a href="about.html" class="active" aria-current="page"><em>03</em>About</a>
+    <a href="blog.html"><em>04</em>Blog</a>
+    <a href="contact.html"><em>05</em>Contact</a>
+  </nav>
+  <div class="mm-actions">
+    <a href="login.html" class="btn btn-ghost">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+      Login
+    </a>
+    <a href="signup.html" class="btn btn-primary">
+      <svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c1.2-3.4 4.2-5 6.5-5s5.3 1.6 6.5 5"/><path d="M19 8v6M22 11h-6"/></svg>
+      Sign Up
+    </a>
+  </div>
+  <p class="mm-note"><span class="live-dot"></span>Lab open today · 6:30 AM – 9 PM</p>
+</aside>
+
+<main>
+
+<!-- ============ 1. HERO — giant founding year + a 3D fan of lab photos that spreads on scroll ============ -->
+<section class="a-hero" id="hero">
+  <div class="ah-bg" aria-hidden="true">
+    <div class="ah-dots"></div>
+    <div class="ah-glow ag1"></div>
+    <div class="ah-glow ag2"></div>
+  </div>
+  <span class="ah-year" aria-hidden="true">2012</span>
+
+  <div class="wrap ah-grid">
+    <div class="ah-copy">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><span aria-current="page">About us</span></nav>
+      <span class="ah-eyebrow"><span class="live-dot"></span>Our story · since 2012</span>
+      <h1 class="ah-title">
+        <span class="ah-l"><span>We started with</span></span>
+        <span class="ah-l"><span>one microscope</span></span>
+        <span class="ah-l"><span class="grad-light">and a promise.</span></span>
+      </h1>
+      <p class="ah-sub">To give every family in Salem lab results they can trust — on time, at a fair price, and explained by people who care.</p>
+      <div class="ah-actions">
+        <a href="#story" class="btn btn-primary btn-lg">Read our story
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+        </a>
+        <a href="#team" class="btn btn-glass btn-lg">Meet the team</a>
+      </div>
+    </div>
+
+    <div class="ah-visual" id="ahVisual">
+      <div class="fan" id="fan">
+        <figure class="ph fan-card" style="--r:-8deg;--x:-74%;--y:-40%;--z:0px">
+          <img src="https://images.unsplash.com/photo-1630959305790-4c956ce6c0b6?auto=format&fit=crop&w=700&q=70" alt="Pathologist looking through a microscope" loading="eager" onerror="this.parentNode.classList.add('is-broken')">
+          <figcaption>2012 · First microscope</figcaption>
+        </figure>
+        <figure class="ph fan-card" style="--r:6deg;--x:40%;--y:-50%;--z:20px">
+          <img src="https://images.unsplash.com/photo-1615461066159-fea0960485d5?auto=format&fit=crop&w=700&q=70" alt="Healthcare worker drawing a blood sample" loading="eager" onerror="this.parentNode.classList.add('is-broken')">
+          <figcaption>2015 · Home collection</figcaption>
+        </figure>
+        <figure class="ph fan-card" style="--r:5deg;--x:-44%;--y:42%;--z:40px">
+          <img src="https://images.unsplash.com/photo-1579165466949-3180a3d056d5?auto=format&fit=crop&w=700&q=70" alt="Scientist using a pipette" loading="eager" onerror="this.parentNode.classList.add('is-broken')">
+          <figcaption>2019 · NABL accredited</figcaption>
+        </figure>
+        <figure class="ph fan-card" style="--r:-7deg;--x:70%;--y:30%;--z:60px">
+          <img src="https://images.unsplash.com/photo-1732690233982-1d4567384ea1?auto=format&fit=crop&w=700&q=70" alt="Lab scientist working at an automated analyser" loading="eager" onerror="this.parentNode.classList.add('is-broken')">
+          <figcaption>2024 · Fully automated</figcaption>
+        </figure>
+      </div>
+      <div class="ah-badge"><b><span data-count="14">0</span> yrs</b><span>of trusted reports</span></div>
+    </div>
+  </div>
+
+  <div class="ah-ticker" aria-hidden="true">
+    <div class="ah-ticker-track">
+      <span>Accuracy</span><i></i><span>Kindness</span><i></i><span>Speed</span><i></i><span>Honest prices</span><i></i><span>Privacy</span><i></i><span>Accuracy</span><i></i><span>Kindness</span><i></i><span>Speed</span><i></i><span>Honest prices</span><i></i><span>Privacy</span><i></i>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. OUR STORY — founder's note ============ -->
+<section class="section story" id="story">
+  <div class="wrap story-grid">
+    <div class="story-visual" data-reveal>
+      <figure class="ph story-img tilt"><img src="https://images.unsplash.com/photo-1614308460927-5024ba2e1dcb?auto=format&fit=crop&w=900&q=70" alt="Laboratory microscope with several objective lenses" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+      <div class="story-stamp"><b>Est.</b><span>2012</span><em>Salem</em></div>
+    </div>
+    <div class="story-copy" data-reveal>
+      <span class="kicker">Our story</span>
+      <h2>A small lab that <span class="grad">refused to cut corners</span></h2>
+      <p>STACKLY Diagnostics began in a two-room clinic on Omalur Road with one pathologist, one technician and a second-hand microscope. Patients told us the same thing again and again: reports came late, nobody explained them, and prices changed depending on who you asked.</p>
+      <p>So we built the lab we wanted for our own families — fixed prices, reports the same day, and a pathologist who would pick up the phone. Fourteen years later we run 18 centres, but every report is still signed by a doctor.</p>
+      <blockquote class="story-quote">
+        <p>“Behind every sample is someone waiting anxiously for an answer. Our job is to make that wait short, and that answer right.”</p>
+        <footer>
+          <span class="sq-av ph"><img src="https://images.unsplash.com/photo-1659353888906-adb3e0041693?auto=format&fit=crop&w=160&h=160&q=70" alt="" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span>
+          <span><b>Dr. Meera Iyer</b><em>Founder &amp; Lab Director</em></span>
+          <svg class="sq-sign" viewBox="0 0 160 50" aria-hidden="true"><path d="M6 36c10-16 18-24 22-20s-8 22-2 22 14-26 20-24-4 22 2 22 12-18 18-18 0 16 6 16 10-12 16-12 2 12 8 12 14-8 22-10 12 2 30-6"/></svg>
+        </footer>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. MISSION · VISION · VALUES ============ -->
+<section class="section mvv" id="mission">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">What drives us</span>
+      <h2>Mission, vision and <span class="grad">the values we hire for</span></h2>
+    </div>
+    <div class="mvv-grid">
+      <article class="mvv-card tilt" style="--c:#14b8a6">
+        <span class="mvv-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></span>
+        <span class="mvv-no">01</span>
+        <h3>Our mission</h3>
+        <p>Deliver accurate, affordable diagnostics to every household in our region, with results people understand and act on.</p>
+      </article>
+      <article class="mvv-card tilt" style="--c:#2563eb">
+        <span class="mvv-ico"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <span class="mvv-no">02</span>
+        <h3>Our vision</h3>
+        <p>Be the most trusted lab in Tamil Nadu by 2030 — the first name doctors recommend and families return to.</p>
+      </article>
+      <article class="mvv-card tilt" style="--c:#8b5cf6">
+        <span class="mvv-ico"><svg viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11z"/></svg></span>
+        <span class="mvv-no">03</span>
+        <h3>Our promise</h3>
+        <p>If a report is late or wrong because of us, the repeat test is free and a pathologist calls you personally.</p>
+      </article>
+    </div>
+    <ul class="values" data-reveal>
+      <li><b>Accuracy first</b><span>We would rather re-run a sample than send a doubtful result.</span></li>
+      <li><b>Kind by default</b><span>Gentle hands, clear words and patience with every patient.</span></li>
+      <li><b>Honest pricing</b><span>One price list, published openly, no surprise add-ons.</span></li>
+      <li><b>Privacy always</b><span>Your reports are yours — shared only with whom you choose.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 4. MILESTONES — horizontal timeline you can drag ============ -->
+<section class="section miles" id="milestones">
+  <div class="wrap">
+    <div class="sec-head sec-head--row" data-reveal>
+      <div>
+        <span class="kicker">Milestones</span>
+        <h2>Fourteen years, <span class="grad">one step at a time</span></h2>
+      </div>
+      <div class="mi-ctrl">
+        <button class="mi-btn" id="miPrev" aria-label="Earlier milestones"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="mi-btn" id="miNext" aria-label="Later milestones"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="mi-scroller" id="miScroller" tabindex="0" aria-label="Milestones timeline">
+    <ol class="mi-track">
+      <li class="mi"><span class="mi-year">2012</span><span class="mi-dot"></span><div class="mi-card"><h3>Doors open</h3><p>A two-room lab on Omalur Road with one pathologist and 40 patients in the first week.</p></div></li>
+      <li class="mi"><span class="mi-year">2014</span><span class="mi-dot"></span><div class="mi-card"><h3>First automated analyser</h3><p>Same-day sugar and lipid reports become standard for every patient.</p></div></li>
+      <li class="mi"><span class="mi-year">2015</span><span class="mi-dot"></span><div class="mi-card"><h3>Home collection launched</h3><p>Two phlebotomists on scooters start visiting homes across Salem town.</p></div></li>
+      <li class="mi"><span class="mi-year">2017</span><span class="mi-dot"></span><div class="mi-card"><h3>Microbiology wing</h3><p>Cultures and antibiotic sensitivity testing move in-house.</p></div></li>
+      <li class="mi"><span class="mi-year">2019</span><span class="mi-dot"></span><div class="mi-card"><h3>NABL accreditation</h3><p>Every department accredited to ISO 15189 after a year of audits.</p></div></li>
+      <li class="mi"><span class="mi-year">2021</span><span class="mi-dot"></span><div class="mi-card"><h3>Molecular lab</h3><p>A clean-room RT-PCR suite opens, running 3,000 tests a day at its peak.</p></div></li>
+      <li class="mi"><span class="mi-year">2023</span><span class="mi-dot"></span><div class="mi-card"><h3>18 centres</h3><p>Collection centres reach Attur, Omalur, Mettur and Edappadi.</p></div></li>
+      <li class="mi mi-now"><span class="mi-year">2026</span><span class="mi-dot"></span><div class="mi-card"><h3>2 million reports</h3><p>And still every one of them signed by a pathologist.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 5. NUMBERS ============ -->
+<section class="numbers" id="numbers" aria-label="STACKLY in numbers">
+  <div class="wrap num-row">
+    <div class="num" data-reveal><b><span data-count="2.1" data-decimals="1">0</span>M+</b><span>reports delivered</span></div>
+    <div class="num" data-reveal><b><span data-count="320">0</span>+</b><span>referring doctors</span></div>
+    <div class="num" data-reveal><b><span data-count="180">0</span></b><span>people on our team</span></div>
+    <div class="num" data-reveal><b><span data-count="18">0</span></b><span>centres in Salem district</span></div>
+  </div>
+</section>
+
+<!-- ============ 6. LEADERSHIP — hover reveals the bio ============ -->
+<section class="section leaders" id="team">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Leadership</span>
+      <h2>The doctors who <span class="grad">sign your reports</span></h2>
+      <p>Every department is led by a specialist with at least ten years of hands-on lab experience.</p>
+    </div>
+    <div class="ld-grid">
+      <article class="ld">
+        <figure class="ph"><img src="https://images.unsplash.com/photo-1659353888906-adb3e0041693?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Meera Iyer" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="ld-body">
+          <span class="ld-role">Founder &amp; Lab Director</span>
+          <h3>Dr. Meera Iyer</h3>
+          <p>MD Pathology. Started the lab in 2012 and still reviews every critical haematology result.</p>
+          <div class="ld-links"><a href="404.html" aria-label="Dr. Meera Iyer on LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="10"/><circle cx="5" cy="5" r="1.6"/><path d="M11 19v-6.5a2.5 2.5 0 0 1 5 0V19M11 12.5V19"/></svg></a><a href="mailto:hello@stackly.com" aria-label="Email Dr. Meera Iyer"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a></div>
+        </div>
+      </article>
+      <article class="ld">
+        <figure class="ph"><img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Arjun Rao" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="ld-body">
+          <span class="ld-role">Head of Biochemistry</span>
+          <h3>Dr. Arjun Rao</h3>
+          <p>MD Biochemistry. Built our automated chemistry line and runs the diabetes and thyroid clinics.</p>
+          <div class="ld-links"><a href="404.html" aria-label="Dr. Arjun Rao on LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="10"/><circle cx="5" cy="5" r="1.6"/><path d="M11 19v-6.5a2.5 2.5 0 0 1 5 0V19M11 12.5V19"/></svg></a><a href="mailto:hello@stackly.com" aria-label="Email Dr. Arjun Rao"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a></div>
+        </div>
+      </article>
+      <article class="ld">
+        <figure class="ph"><img src="https://images.unsplash.com/photo-1673865641073-4479f93a7776?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Kavya Nair" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="ld-body">
+          <span class="ld-role">Head of Microbiology</span>
+          <h3>Dr. Kavya Nair</h3>
+          <p>MD Microbiology. Leads our infection testing and the molecular PCR lab.</p>
+          <div class="ld-links"><a href="404.html" aria-label="Dr. Kavya Nair on LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="10"/><circle cx="5" cy="5" r="1.6"/><path d="M11 19v-6.5a2.5 2.5 0 0 1 5 0V19M11 12.5V19"/></svg></a><a href="mailto:hello@stackly.com" aria-label="Email Dr. Kavya Nair"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a></div>
+        </div>
+      </article>
+      <article class="ld">
+        <figure class="ph"><img src="https://images.unsplash.com/photo-1712215544003-af10130f8eb3?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Vikram Shah" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="ld-body">
+          <span class="ld-role">Head of Histopathology</span>
+          <h3>Dr. Vikram Shah</h3>
+          <p>MD Pathology. Reports biopsies and cytology, with a second review on every cancer diagnosis.</p>
+          <div class="ld-links"><a href="404.html" aria-label="Dr. Vikram Shah on LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="10"/><circle cx="5" cy="5" r="1.6"/><path d="M11 19v-6.5a2.5 2.5 0 0 1 5 0V19M11 12.5V19"/></svg></a><a href="mailto:hello@stackly.com" aria-label="Email Dr. Vikram Shah"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. QUALITY & ACCREDITATION ============ -->
+<section class="section quality" id="quality">
+  <div class="wrap q-grid">
+    <div class="q-copy" data-reveal>
+      <span class="kicker kicker--light">Quality &amp; accreditation</span>
+      <h2>Audited by outsiders, <span class="grad-light">every single year</span></h2>
+      <p>We don't ask you to take our word for it. Independent bodies inspect our people, instruments and records — and we publish the results.</p>
+      <div class="q-badges">
+        <div class="qb"><span class="qb-ring"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3zM9 12l2 2 4-4"/></svg></span><b>NABL</b><span>ISO 15189:2022</span></div>
+        <div class="qb"><span class="qb-ring"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.5 14l-1.5 7 5-3 5 3-1.5-7"/></svg></span><b>ISO 9001</b><span>Quality management</span></div>
+        <div class="qb"><span class="qb-ring"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 16l4-6 4 3 6-8"/></svg></span><b>EQAS</b><span>99.6% proficiency</span></div>
+        <div class="qb"><span class="qb-ring"><svg viewBox="0 0 24 24"><path d="M6 11h12v10H6zM8 11V8a4 4 0 0 1 8 0v3"/></svg></span><b>DPDP ready</b><span>Data privacy</span></div>
+      </div>
+      <a href="404.html" class="btn btn-glass">Download our certificates <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></a>
+    </div>
+    <div class="q-visual" data-reveal>
+      <figure class="ph q-img tilt"><img src="https://images.unsplash.com/photo-1639772823907-a716be4bdecc?auto=format&fit=crop&w=900&q=70" alt="Gloved hand operating a microscope in the laboratory" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+      <div class="q-card">
+        <span>Today's quality control</span>
+        <ul>
+          <li><i class="ok"></i>Haematology<b>Passed 06:40</b></li>
+          <li><i class="ok"></i>Biochemistry<b>Passed 06:50</b></li>
+          <li><i class="ok"></i>Immunoassay<b>Passed 07:05</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. TRUSTED BY DOCTORS — 3D coverflow slider ============ -->
+<section class="section doctors" id="doctors">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Trusted by doctors</span>
+      <h2>What the doctors <span class="grad">who refer to us say</span></h2>
+      <p>More than 320 doctors and 40 hospitals across Salem district send their patients to our lab.</p>
+    </div>
+  </div>
+  <div class="cf" id="coverflow" data-reveal>
+    <div class="cf-stage" id="cfStage" aria-live="polite">
+      <figure class="cf-slide">
+        <div class="cf-top">
+          <span class="cf-av ph"><img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&h=200&q=70" alt="Portrait of Dr. Sanjay Babu" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span>
+          <span class="cf-who"><b>Dr. Sanjay Babu</b><small>Physician, MD</small><em>Salem District Hospital</em></span>
+        </div>
+        <blockquote>“When a potassium came back at 6.4, the pathologist called me before the report was even out. That call is why I refer every patient here.”</blockquote>
+        <figcaption class="cf-stat"><b>9 yrs</b><span>referring patients</span></figcaption>
+      </figure>
+      <figure class="cf-slide">
+        <div class="cf-top">
+          <span class="cf-av ph"><img src="https://images.unsplash.com/photo-1638202993928-7267aad84c31?auto=format&fit=crop&w=200&h=200&q=70" alt="Portrait of Dr. Anitha Raman" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span>
+          <span class="cf-who"><b>Dr. Anitha Raman</b><small>Gynaecologist</small><em>Lotus Multispeciality Clinic</em></span>
+        </div>
+        <blockquote>“Thyroid and fertility panels come back the same day with last year's values printed alongside. My patients finally understand their trends.”</blockquote>
+        <figcaption class="cf-stat"><b>1,400+</b><span>patients referred</span></figcaption>
+      </figure>
+      <figure class="cf-slide">
+        <div class="cf-top">
+          <span class="cf-av ph"><img src="https://images.unsplash.com/photo-1637059824899-a441006a6875?auto=format&fit=crop&w=200&h=200&q=70" alt="Portrait of Dr. Prakash Kumar" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span>
+          <span class="cf-who"><b>Dr. Prakash Kumar</b><small>Urologist</small><em>Kaveri Urology Centre</em></span>
+        </div>
+        <blockquote>“Their microbiology team helps me choose the right antibiotic for difficult urine infections. Reports are clear and consistent.”</blockquote>
+        <figcaption class="cf-stat"><b>48 h</b><span>culture turnaround</span></figcaption>
+      </figure>
+      <figure class="cf-slide">
+        <div class="cf-top">
+          <span class="cf-av ph"><img src="https://images.unsplash.com/photo-1643297654416-05795d62e39c?auto=format&fit=crop&w=200&h=200&q=70" alt="Portrait of Dr. Fathima Begum" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span>
+          <span class="cf-who"><b>Dr. Fathima Begum</b><small>Diabetologist</small><em>Sugar Care Clinic, Fairlands</em></span>
+        </div>
+        <blockquote>“For diabetes follow-ups the home collection is a blessing for my elderly patients. Samples are drawn before breakfast, reports by lunch.”</blockquote>
+        <figcaption class="cf-stat"><b>6 h</b><span>average HbA1c report</span></figcaption>
+      </figure>
+      <figure class="cf-slide">
+        <div class="cf-top">
+          <span class="cf-av ph"><img src="https://images.unsplash.com/photo-1645066928295-2506defde470?auto=format&fit=crop&w=200&h=200&q=70" alt="Portrait of Dr. Ramesh Iyer" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span>
+          <span class="cf-who"><b>Dr. Ramesh Iyer</b><small>Medical Superintendent</small><em>Sunrise Hospital, Attur</em></span>
+        </div>
+        <blockquote>“We outsourced our hospital lab to STACKLY in 2021. Quality audits have been spotless and our turnaround improved by a third.”</blockquote>
+        <figcaption class="cf-stat"><b>32%</b><span>faster turnaround</span></figcaption>
+      </figure>
+    </div>
+    <div class="cf-ctrl">
+      <button class="cf-btn" id="cfPrev" aria-label="Previous doctor"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="cf-dots" id="cfDots"></div>
+      <button class="cf-btn" id="cfNext" aria-label="Next doctor"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <div class="wrap">
+    <ul class="partners" data-reveal>
+      <li>Salem District Hospital</li><li>Sunrise Hospital</li><li>Lotus Multispeciality</li><li>Kaveri Urology</li><li>Sugar Care Clinic</li><li>Kaveri Insurance TPA</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 9. COMMUNITY — gallery + impact ============ -->
+<section class="section community" id="community">
+  <div class="wrap cm-grid">
+    <div class="cm-gallery">
+      <figure class="ph cm-a tilt"><img src="https://images.unsplash.com/photo-1504813184591-01572f98c85f?auto=format&fit=crop&w=800&q=70" alt="Medical professionals working together" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+      <figure class="ph cm-b tilt"><img src="https://images.unsplash.com/photo-1625131135576-97ddbb6f063c?auto=format&fit=crop&w=600&q=70" alt="Caregiver gently holding a baby's hand" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+      <figure class="ph cm-c tilt"><img src="https://images.unsplash.com/photo-1730130596425-197566414dc4?auto=format&fit=crop&w=600&q=70" alt="A family sitting together at home" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+    </div>
+    <div class="cm-copy" data-reveal>
+      <span class="kicker">In the community</span>
+      <h2>Health camps where <span class="grad">labs don't usually reach</span></h2>
+      <p>Twice a month our team takes free screening camps to villages, schools and old-age homes across Salem district — sugar, haemoglobin and blood pressure, with a doctor on hand to explain the results.</p>
+      <div class="cm-stats">
+        <div><b><span data-count="260">0</span>+</b><span>free camps held</span></div>
+        <div><b><span data-count="48000">0</span></b><span>people screened</span></div>
+        <div><b><span data-count="35">0</span></b><span>partner schools</span></div>
+      </div>
+      <a href="404.html" class="text-link">Invite us to your community <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. CAREERS — open roles ============ -->
+<section class="section careers" id="careers">
+  <div class="wrap cr-grid">
+    <div class="cr-copy" data-reveal>
+      <span class="kicker">Careers</span>
+      <h2>Do the most important work <span class="grad">nobody sees</span></h2>
+      <p>We look for people who are careful, curious and kind. In return: paid training, a clear growth path from technician to supervisor, and health cover for your family.</p>
+      <figure class="ph cr-img tilt"><img src="https://images.unsplash.com/photo-1583911860205-72f8ac8ddcbe?auto=format&fit=crop&w=900&q=70" alt="Lab professional in a white coat at work" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+    </div>
+    <div class="cr-roles" data-reveal>
+      <div class="cr-head"><h3>Open roles</h3><span class="cr-count">5 positions</span></div>
+      <a href="404.html" class="role"><span><b>Senior lab technician</b><small>Biochemistry · Salem main centre · Full time</small></span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="404.html" class="role"><span><b>Phlebotomist (home collection)</b><small>Field · Salem town · Full time</small></span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="404.html" class="role"><span><b>Consultant pathologist</b><small>Histopathology · Salem main centre · Full time</small></span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="404.html" class="role"><span><b>Customer care executive</b><small>Front desk · Fairlands · Full time</small></span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="404.html" class="role"><span><b>Quality officer</b><small>Quality · Salem main centre · Full time</small></span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <p class="cr-note">Don't see your role? Send your CV to <a href="mailto:hello@stackly.com">hello@stackly.com</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-glow" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="footer-cta" data-reveal>
+      <div>
+        <h3>Book your test today — reports by this evening.</h3>
+        <p>Free home collection across Salem from 6:30 AM.</p>
+      </div>
+      <a href="contact.html" class="btn btn-primary">Talk to our team
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo" aria-label="Home">
+          <img src="../assets/Logo.webp" alt="Company logo">
+        </a>
+        <p>Accurate diagnostics, free home collection and reports you can understand — for every family in Salem.</p>
+        <div class="footer-social">
+          <a href="404.html" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="404.html" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 21v-7h2.5l.5-3H14V9.2c0-.9.3-1.7 1.7-1.7H17V5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.2V11H8v3h2.6v7"/></svg></a>
+          <a href="404.html" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="10"/><circle cx="5" cy="5" r="1.6"/><path d="M11 19v-6.5a2.5 2.5 0 0 1 5 0V19M11 12.5V19"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="404.html">Blood tests</a>
+        <a href="404.html">Health packages</a>
+        <a href="404.html">Home sample collection</a>
+        <a href="404.html">Histopathology</a>
+        <a href="404.html">Corporate wellness</a>
+      </div>
+      <div class="footer-col">
+        <h4>Get In Touch</h4>
+        <ul class="footer-contact">
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+            <a href="404.html">MMR Complex, Periyakollappatty,<br>Chinna Thirupathi, Salem, Tamil<br>Nadu 636008</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <a href="tel:07123712345">0712 371 2345</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <a href="mailto:hello@stackly.com">hello@stackly.com</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 STACKLY SOLUTIONS</span>
+      <span class="status-dot"><span class="live-dot"></span>Lab open · reports going out now</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Back to top — the ring fills as you scroll -->
+<button class="to-top" id="toTop" aria-label="Back to top">
+  <svg class="tt-ring" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><circle class="tt-fill" id="ttFill" cx="24" cy="24" r="21"/></svg>
+  <svg class="tt-arrow" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+(function () {
+  'use strict';
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HAS_GSAP = !!(window.gsap && window.ScrollTrigger);
+  var ANIM = HAS_GSAP && !REDUCED;
+  var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  if (ANIM) { gsap.registerPlugin(ScrollTrigger); ScrollTrigger.clearScrollMemory('manual'); }
+
+  /* ---------- Preloader ---------- */
+  var pre = $('#preloader'), pct = $('#plPct'), liquid = $('#plLiquid'), p = 0, done = false, finished = false;
+  var tick = setInterval(function () {
+    p = Math.min(p + Math.random() * 20, done ? 100 : 92);
+    pct.textContent = Math.round(p) + '%';
+    liquid.style.height = p + '%';
+    if (p >= 100) finishLoad();
+  }, 100);
+  function finishLoad() {
+    if (finished) return;
+    finished = true;
+    clearInterval(tick);
+    pct.textContent = '100%'; liquid.style.height = '100%';
+    pre.classList.add('is-done');
+    document.body.classList.remove('is-loading');
+    setTimeout(function () { pre.style.display = 'none'; }, 700);
+    heroIntro();
+  }
+  window.addEventListener('load', function () { done = true; });
+  setTimeout(function () { done = true; }, 1200);
+  setTimeout(finishLoad, 3000);
+
+  /* ---------- Header: transparent over the hero, solid on scroll; the logo gets its plate ---------- */
+  var header = $('#siteHeader'), bar = $('#scrollBar');
+  var toTop = $('#toTop'), ttFill = $('#ttFill'), ringLen = 2 * Math.PI * 21;
+  ttFill.style.strokeDasharray = ringLen;
+  var wasSolid = false;
+  function onScroll() {
+    var y = window.scrollY, max = document.documentElement.scrollHeight - innerHeight;
+    var prog = max > 0 ? y / max : 0;
+    var solid = y > 40;
+    if (solid !== wasSolid) {
+      header.classList.toggle('is-solid', solid);
+      wasSolid = solid;
+      if (ANIM) gsap.fromTo('.site-header .logo', { scale: .9, rotateX: solid ? -60 : 60 }, { scale: 1, rotateX: 0, duration: .6, ease: 'back.out(2)', clearProps: 'transform' });
+    }
+    bar.style.transform = 'scaleX(' + prog + ')';
+    ttFill.style.strokeDashoffset = ringLen * (1 - prog);
+    toTop.classList.toggle('is-on', y > 600);
+  }
+  toTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
+
+  /* ---------- Nav underline ---------- */
+  var navLinks = $('#navLinks'), navLine = $('#navLine');
+  function moveLine(a) {
+    if (!a) return;
+    navLine.style.width = a.offsetWidth + 'px';
+    navLine.style.transform = 'translateX(' + a.offsetLeft + 'px)';
+  }
+  $$('a', navLinks).forEach(function (a) { a.addEventListener('mouseenter', function () { moveLine(a); }); });
+  navLinks.addEventListener('mouseleave', function () { moveLine($('a.active', navLinks)); });
+  window.addEventListener('load', function () { moveLine($('a.active', navLinks)); });
+  window.addEventListener('resize', function () { moveLine($('a.active', navLinks)); });
+  moveLine($('a.active', navLinks));
+
+  /* ---------- Mobile menu (full screen) ---------- */
+  var menu = $('#mobileMenu'), scrim = $('#menuScrim'), burger = $('#hamburger');
+  function openMenu() {
+    menu.classList.add('is-open'); scrim.classList.add('is-on');
+    document.body.classList.add('menu-open');
+    burger.classList.add('is-open'); burger.setAttribute('aria-expanded', 'true'); burger.setAttribute('aria-label', 'Close menu');
+    menu.setAttribute('aria-hidden', 'false');
+    if (ANIM) gsap.from('.mm-links a', { x: 40, opacity: 0, duration: .45, stagger: .05, delay: .12, ease: 'power3.out', clearProps: 'transform,opacity' });
+  }
+  function closeMenu() {
+    menu.classList.remove('is-open'); scrim.classList.remove('is-on');
+    document.body.classList.remove('menu-open');
+    burger.classList.remove('is-open'); burger.setAttribute('aria-expanded', 'false'); burger.setAttribute('aria-label', 'Open menu');
+    menu.setAttribute('aria-hidden', 'true');
+  }
+  burger.addEventListener('click', function () { menu.classList.contains('is-open') ? closeMenu() : openMenu(); });
+  $('#mobileMenuClose').addEventListener('click', closeMenu);
+  scrim.addEventListener('click', closeMenu);
+  $$('a', menu).forEach(function (a) { a.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', function () { if (innerWidth > 1024) closeMenu(); });
+
+  /* ---------- Smooth in-page anchors ---------- */
+  $$('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var id = a.getAttribute('href');
+      var t = id.length > 1 && document.querySelector(id);
+      if (!t) return;
+      e.preventDefault();
+      window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - 70, behavior: REDUCED ? 'auto' : 'smooth' });
+    });
+  });
+
+  /* ---------- Counters (count up when they scroll into view) ---------- */
+  function countUp(el) {
+    if (el.dataset.done) return;
+    el.dataset.done = 1;
+    var target = parseFloat(el.dataset.count), dec = parseInt(el.dataset.decimals || 0, 10);
+    if (REDUCED) { el.textContent = dec ? target.toFixed(dec) : target.toLocaleString('en-IN'); return; }
+    var start = null, dur = 1600;
+    function step(ts) {
+      if (!start) start = ts;
+      var k = Math.min(1, (ts - start) / dur), e = 1 - Math.pow(1 - k, 4);
+      el.textContent = dec ? (target * e).toFixed(dec) : Math.round(target * e).toLocaleString('en-IN');
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if ('IntersectionObserver' in window) {
+    var cio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { countUp(en.target); cio.unobserve(en.target); } });
+    }, { threshold: .4 });
+    $$('[data-count]').forEach(function (c) { if (!c.closest('.a-hero')) cio.observe(c); });
+  } else {
+    $$('[data-count]').forEach(countUp);
+  }
+
+  /* =========================================================
+     HERO — the photo fan
+     ========================================================= */
+  var fan = $('#fan'), fanCards = $$('.fan-card', fan), hero = $('#hero');
+  function heroIntro() {
+    $$('.a-hero [data-count]').forEach(countUp);
+    if (!ANIM) return;
+    var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+    tl.from('.ah-year', { yPercent: 30, opacity: 0, duration: 1.6, ease: 'power3.out' }, 0)
+      .from('.crumbs, .ah-eyebrow', { y: 18, opacity: 0, duration: .6, stagger: .08 }, .1)
+      .from('.ah-l > span', { yPercent: 110, rotationX: -60, duration: 1, stagger: .12, transformOrigin: '50% 100%' }, .25)
+      .from('.ah-sub', { y: 18, opacity: 0, duration: .6 }, '-=.55')
+      .from('.ah-actions > *', { y: 18, opacity: 0, duration: .5, stagger: .08 }, '-=.4')
+      // cards fly in from a closed stack, then fan out
+      .from(fanCards, { xPercent: -50, yPercent: -50, rotation: 0, rotationY: -70, z: -400, opacity: 0, duration: 1.3, stagger: .12, ease: 'power3.out', clearProps: 'opacity' }, .2)
+      .from('.ah-badge', { scale: 0, rotation: -30, duration: .8, ease: 'back.out(2)' }, 1)
+      .from('.ah-ticker', { yPercent: 100, opacity: 0, duration: .8 }, .9);
+  }
+  // each card sits at its own spot in the fan; scrolling spreads them further apart in 3D
+  var BASE = window.innerWidth < 420 ? .82 : window.innerWidth < 700 ? .92 : 1;
+  fanCards.forEach(function (c) {
+    var cs = getComputedStyle(c);
+    c._r = parseFloat(cs.getPropertyValue('--r')); c._x = parseFloat(cs.getPropertyValue('--x')); c._y = parseFloat(cs.getPropertyValue('--y')); c._z = parseFloat(cs.getPropertyValue('--z'));
+    if (ANIM) gsap.set(c, { x: 0, y: 0, xPercent: -50 + c._x * BASE, yPercent: -50 + c._y * BASE, rotation: c._r, z: c._z, transformPerspective: 1200 });
+  });
+  var SMALL = window.innerWidth < 700, SPREAD = SMALL ? 1.05 : 1.25, DEPTH = SMALL ? 1.4 : 2;
+  if (ANIM) {
+    gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } })
+      .to(fanCards, { xPercent: function (i) { return -50 + fanCards[i]._x * SPREAD; }, rotation: function (i) { return fanCards[i]._r * 1.5; }, rotationY: function (i) { return (i - 1.5) * -12; }, z: function (i) { return fanCards[i]._z * DEPTH; }, ease: 'none' }, 0)
+      .to('.ah-year', { yPercent: -35, opacity: .35, ease: 'none' }, 0)
+      .to('.ah-copy', { y: -60, opacity: .2, ease: 'none' }, 0);
+    if (FINE) {
+      var fx = gsap.quickTo(fan, 'rotationY', { duration: .9, ease: 'power3' });
+      var fy = gsap.quickTo(fan, 'rotationX', { duration: .9, ease: 'power3' });
+      var yx = gsap.quickTo('.ah-year', 'x', { duration: 1.2, ease: 'power3' });
+      hero.addEventListener('mousemove', function (e) {
+        var r = hero.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        fx(x * 12); fy(-y * 8); yx(-x * 40);
+      });
+      hero.addEventListener('mouseleave', function () { fx(0); fy(0); yx(0); });
+    }
+  }
+
+
+  // pointing at (or tapping) a photo lifts it to the front of the collage
+  function liftCard(c, up) {
+    if (up) fanCards.forEach(function (o) { if (o !== c && o.classList.contains('is-up')) liftCard(o, false); });
+    c.classList.toggle('is-up', up);
+    if (ANIM) gsap.to(c, { z: up ? 150 : c._z, scale: up ? 1.07 : 1, rotation: up ? 0 : c._r, duration: up ? .5 : .6, ease: 'power3.out' });
+  }
+  fanCards.forEach(function (c) {
+    c.addEventListener('mouseenter', function () { if (FINE) liftCard(c, true); });
+    c.addEventListener('mouseleave', function () { if (FINE) liftCard(c, false); });
+    c.addEventListener('click', function () { if (!FINE) liftCard(c, !c.classList.contains('is-up')); });
+  });
+
+  /* =========================================================
+     SCROLL MOTION — the page is fully visible without GSAP
+     ========================================================= */
+  if (ANIM) {
+    $$('[data-reveal]').forEach(function (el) {
+      gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 88%', once: true }, y: 46, rotationX: function () { return el.offsetHeight > 500 ? 6 : 14; }, opacity: 0, transformPerspective: 1200, transformOrigin: '50% 0%', duration: .9, ease: 'power3.out', clearProps: 'transform,opacity' });
+    });
+    ScrollTrigger.batch('.mvv-card', {
+      start: 'top 88%', once: true,
+      onEnter: function (b) { gsap.from(b, { y: 70, rotationY: 35, opacity: 0, transformPerspective: 1000, duration: .9, stagger: .12, ease: 'power3.out', clearProps: 'transform,opacity' }); }
+    });
+    ScrollTrigger.batch('.ld', {
+      start: 'top 88%', once: true,
+      onEnter: function (b) { gsap.from(b, { y: 80, rotationX: 30, z: -100, opacity: 0, transformPerspective: 1000, transformOrigin: '50% 100%', duration: 1, stagger: .1, ease: 'power3.out', clearProps: 'transform,opacity' }); }
+    });
+    ScrollTrigger.batch('.mi', {
+      start: 'top 90%', once: true,
+      onEnter: function (b) { gsap.from(b, { y: 40, opacity: 0, duration: .7, stagger: .07, ease: 'power3.out', clearProps: 'transform,opacity' }); }
+    });
+    gsap.from('.cm-gallery .ph', { scrollTrigger: { trigger: '.cm-gallery', start: 'top 80%', once: true }, rotationY: function (i) { return i === 0 ? -40 : 40; }, z: -200, opacity: 0, transformPerspective: 1000, duration: 1.1, stagger: .15, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from('.q-card', { scrollTrigger: { trigger: '.q-visual', start: 'top 75%', once: true }, x: 60, z: -150, rotationY: -30, opacity: 0, transformPerspective: 1000, duration: 1, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from('.story-stamp', { scrollTrigger: { trigger: '.story-visual', start: 'top 75%', once: true }, scale: 0, rotation: -90, duration: 1, ease: 'back.out(1.8)', clearProps: 'transform' });
+    // the founder's signature writes itself
+    var sig = $('.sq-sign path');
+    if (sig && sig.getTotalLength) {
+      var sl = sig.getTotalLength();
+      gsap.fromTo(sig, { strokeDasharray: sl, strokeDashoffset: sl }, { strokeDashoffset: 0, duration: 2, ease: 'power1.inOut', scrollTrigger: { trigger: '.story-quote', start: 'top 80%', once: true } });
+    }
+    $$('.story-img img, .q-img img, .cr-img img').forEach(function (img) {
+      gsap.fromTo(img, { yPercent: -5, scale: 1.12 }, { yPercent: 5, scale: 1.12, ease: 'none', scrollTrigger: { trigger: img.parentNode, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+  }
+
+  /* ---------- 3D tilt on cards (mouse only) ---------- */
+  if (FINE && !REDUCED) {
+    $$('.tilt').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        card.style.transform = 'perspective(900px) rotateY(' + (x * 10) + 'deg) rotateX(' + (-y * 8) + 'deg) translateZ(6px)';
+        card.style.setProperty('--gx', (x + .5) * 100 + '%');
+        card.style.setProperty('--gy', (y + .5) * 100 + '%');
+      });
+      card.addEventListener('mouseleave', function () { card.style.transform = ''; });
+    });
+  }
+
+  /* ---------- Milestones: buttons, drag to scroll, wheel stays vertical ---------- */
+  var mi = $('#miScroller');
+  function miStep() { var c = mi.querySelector('.mi'); return c ? c.offsetWidth + 24 : 300; }
+  function miUpdate() {
+    var max = mi.scrollWidth - mi.clientWidth - 2;
+    $('#miPrev').disabled = mi.scrollLeft <= 2;
+    $('#miNext').disabled = mi.scrollLeft >= max;
+  }
+  $('#miPrev').addEventListener('click', function () { mi.scrollBy({ left: -miStep() * 2, behavior: REDUCED ? 'auto' : 'smooth' }); });
+  $('#miNext').addEventListener('click', function () { mi.scrollBy({ left: miStep() * 2, behavior: REDUCED ? 'auto' : 'smooth' }); });
+  mi.addEventListener('scroll', miUpdate, { passive: true });
+  window.addEventListener('resize', miUpdate);
+  var mdx = null, msl = 0;
+  mi.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; mdx = e.clientX; msl = mi.scrollLeft; mi.classList.add('is-drag'); });
+  window.addEventListener('pointermove', function (e) { if (mdx === null) return; mi.scrollLeft = msl - (e.clientX - mdx); });
+  window.addEventListener('pointerup', function () { mdx = null; mi.classList.remove('is-drag'); });
+  mi.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); mi.scrollBy({ left: miStep(), behavior: 'smooth' }); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); mi.scrollBy({ left: -miStep(), behavior: 'smooth' }); }
+  });
+  miUpdate();
+
+  /* ---------- Doctors: 3D coverflow slider (buttons, dots, swipe, autoplay) ---------- */
+  var cfStage = $('#cfStage'), cfSlides = $$('.cf-slide', cfStage), cfDots = $('#cfDots'), cfi = 0, cfTimer = null;
+  var CN = cfSlides.length;
+  cfSlides.forEach(function (sl, i) {
+    var d = document.createElement('button');
+    d.setAttribute('aria-label', 'Show doctor ' + (i + 1));
+    d.addEventListener('click', function () { cfGo(i); cfRestart(); });
+    cfDots.appendChild(d);
+    sl.addEventListener('click', function () { if (i !== cfi) { cfGo(i); cfRestart(); } });
+  });
+  function cfLayout() {
+    var narrow = innerWidth < 700;
+    var step = narrow ? 58 : 74;           // how far side slides sit, in % of a slide's width
+    cfSlides.forEach(function (sl, i) {
+      var off = i - cfi;
+      if (off > CN / 2) off -= CN;
+      if (off < -CN / 2) off += CN;
+      var a = Math.abs(off);
+      var tx = off * step - (a > 1 ? Math.sign(off) * (a - 1) * (narrow ? 14 : 18) : 0);
+      sl.style.transform = 'translateX(calc(-50% + ' + tx + '%)) translateZ(' + (-a * 140) + 'px) rotateY(' + (off * -32) + 'deg) scale(' + (1 - a * .08) + ')';
+      sl.style.opacity = a >= 2 ? 0 : a === 1 ? (narrow ? .55 : .6) : 1;
+      sl.style.zIndex = 10 - a;
+      sl.style.pointerEvents = a > 1 ? 'none' : 'auto';
+      sl.classList.toggle('is-active', off === 0);
+      sl.setAttribute('aria-hidden', off === 0 ? 'false' : 'true');
+    });
+    $$('button', cfDots).forEach(function (d, i) { d.classList.toggle('on', i === cfi); });
+    // the stage grows to fit the tallest quote, so it never covers the buttons
+    var tallest = 0;
+    cfSlides.forEach(function (sl) { tallest = Math.max(tallest, sl.offsetHeight); });
+    cfStage.style.height = (tallest + 30) + 'px';
+  }
+  function cfGo(n) { cfi = (n + CN) % CN; cfLayout(); }
+  function cfRestart() { clearInterval(cfTimer); if (!REDUCED) cfTimer = setInterval(function () { cfGo(cfi + 1); }, 5000); }
+  $('#cfPrev').addEventListener('click', function () { cfGo(cfi - 1); cfRestart(); });
+  $('#cfNext').addEventListener('click', function () { cfGo(cfi + 1); cfRestart(); });
+  var cfx = null;
+  cfStage.addEventListener('pointerdown', function (e) { cfx = e.clientX; });
+  cfStage.addEventListener('pointerup', function (e) {
+    if (cfx === null) return;
+    var dx = e.clientX - cfx; cfx = null;
+    if (Math.abs(dx) > 40) { cfGo(cfi + (dx < 0 ? 1 : -1)); cfRestart(); }
+  });
+  $('#coverflow').addEventListener('mouseenter', function () { clearInterval(cfTimer); });
+  $('#coverflow').addEventListener('mouseleave', cfRestart);
+  document.addEventListener('keydown', function (e) {
+    if (!cfStage.matches(':hover') && !cfStage.contains(document.activeElement)) return;
+    if (e.key === 'ArrowRight') cfGo(cfi + 1);
+    if (e.key === 'ArrowLeft') cfGo(cfi - 1);
+  });
+  window.addEventListener('resize', cfLayout);
+  cfLayout(); cfRestart();
+
+  /* ---------- Scroll loop ---------- */
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { onScroll(); ticking = false; });
+  }, { passive: true });
+  window.addEventListener('load', function () { if (ANIM) ScrollTrigger.refresh(); });
+  onScroll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Console – Diagnostic Laboratory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/admindashboard.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body class="is-admin">
+
+  <!-- Background: electrophoresis gel — lanes with bands slowly migrating -->
+  <div class="bg" aria-hidden="true">
+    <div class="bg-gel"></div>
+    <div class="bg-bands" id="bgBands"></div>
+    <div class="bg-glow bg-glow--one"></div>
+    <div class="bg-glow bg-glow--two"></div>
+  </div>
+
+  <!-- ============ SIDEBAR (fixed on desktop, drawer on tablet/phone) ============ -->
+  <div class="scrim" id="scrim"></div>
+  <aside class="dock" id="sidebar" aria-label="Admin menu">
+    <div class="dock-head">
+      <button class="brand" data-nav="dashboard" aria-label="Go to overview">
+        <img class="brand-img" src="../assets/Logo.webp" alt="Company logo">
+      </button>
+      <button class="dock-close" id="dock-close" aria-label="Close menu">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="dock-status dock-status--admin">
+      <span class="shield-dot">
+        <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+      </span>
+      <div>
+        <span class="dock-status-title">Lab operations</span>
+        <span class="dock-status-sub">4 centres · 6 analysers online</span>
+      </div>
+    </div>
+
+    <div class="dock-scroll" id="nav-drawer"></div>
+
+    <div class="dock-foot">
+      <div class="dock-user">
+        <span class="avatar avatar--admin" id="sidebar-user-avatar">–</span>
+        <div class="dock-user-info">
+          <span class="dock-user-name" id="sidebar-user-name">Signed out</span>
+          <span class="dock-user-email" id="sidebar-user-email">—</span>
+        </div>
+      </div>
+      <button class="dock-signout" id="logout-btn" aria-label="Sign out" title="Sign out">
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="head" id="topbar">
+    <div class="head-left">
+      <button class="burger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="admin-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>
+        Admin
+      </span>
+      <span class="shift-badge"><span class="live-dot"></span>Morning shift · 06:30–14:30</span>
+    </div>
+
+    <div class="head-right">
+      <form class="finder" id="topbar-search" autocomplete="off" role="search">
+        <button type="submit" class="finder-go" aria-label="Search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>
+        </button>
+        <input id="topbar-search-input" placeholder="Search staff by name, role, centre…" aria-label="Search staff">
+        <kbd class="finder-key">/</kbd>
+      </form>
+
+      <button class="icon-btn" id="notif-btn" aria-label="Reports awaiting sign-off">
+        <svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.5 20a2 2 0 0 0 3 0"/></svg>
+        <span class="icon-dot"></span>
+      </button>
+
+      <div class="whoami" id="topbar-user">
+        <button class="whoami-btn" id="topbar-user-btn" aria-haspopup="true" aria-expanded="false">
+          <span class="avatar avatar--admin sm" id="topbar-user-avatar">–</span>
+          <span class="whoami-text">
+            <span class="whoami-name" id="topbar-user-name">Signed out</span>
+            <span class="whoami-role" id="topbar-user-role">Lab administrator</span>
+          </span>
+          <svg class="whoami-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="whoami-menu" id="topbar-user-menu">
+          <div class="whoami-menu-head">
+            <span>Signed in as</span>
+            <span class="whoami-menu-email" id="topbar-user-email">—</span>
+          </div>
+          <button class="whoami-item" data-nav="settings">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg>
+            Settings
+          </button>
+          <button class="whoami-item" data-nav="security">
+            <svg viewBox="0 0 24 24"><path d="M6 11h12v10H6zM8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            Security policy
+          </button>
+          <button class="whoami-item danger" id="topbar-logout-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg>
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ PAGE ============ -->
+  <main class="page">
+    <div class="page-head" id="page-head">
+      <div>
+        <p class="page-kicker" id="page-kicker">Admin console</p>
+        <h1 id="page-title-text">Overview</h1>
+        <p class="page-sub" id="page-sub-text"></p>
+      </div>
+      <div class="page-actions" id="page-actions"></div>
+    </div>
+    <div class="content" id="content-area"></div>
+  </main>
+
+  <div class="chart-tip" id="chart-tip" role="status"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <script>
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ANIM = !!window.gsap && !REDUCED;
+
+  /* =========================================================
+     ICONS
+     ========================================================= */
+  const ICONS = {
+    grid:     'M4 4h7v7H4zM13 4h7v4h-7zM13 12h7v8h-7zM4 15h7v5H4z',
+    flask:    'M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-2.5L14 9V3M7 15h10',
+    sign:     'M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 14l2 2 4-4',
+    cpu:      'M7 7h10v10H7zM10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4',
+    qc:       'M3 20h18M5 16l4-6 4 3 6-8M5 4v2M5 9v.01',
+    log:      'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+    pin:      'M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21zM12 7.1a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8',
+    users:    'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M2.5 20c.8-3.5 3.5-5.5 6.5-5.5s5.7 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14.5c2 .7 3.2 2.6 3.5 5.5',
+    rupee:    'M6 4h12M6 9h12M13 20L7 14h2a4.5 4.5 0 0 0 0-10',
+    invoice:  'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3',
+    lock:     'M6 11h12v10H6zM8 11V8a4 4 0 0 1 8 0v3',
+    gear:     'M12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1',
+    shield:   'M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3zM9 12l2 2 4-4',
+    clock:    'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2',
+    alert:    'M12 4l9 16H3zM12 10v4.2M12 17.4v.4',
+    check:    'M20 6L9 17l-5-5',
+    x:        'M6 6l12 12M18 6L6 18',
+    undo:     'M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3',
+    phone:    'M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z',
+    plus:     'M12 5v14M5 12h14',
+    download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
+    pulse:    'M3 12h4l2-6 4 12 2-6h6',
+    home:     'M3 11l9-8 9 8M5 10v10h14V10',
+    wrench:   'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z',
+    drop:     'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z'
+  };
+  function ico(name, cls) {
+    return `<svg class="${cls || 'ico'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${ICONS[name] || ICONS.grid}"/></svg>`;
+  }
+
+  /* =========================================================
+     DEMO DATA — one lab network in Salem
+     ========================================================= */
+  const deptColor = { Biochemistry: '#0d9488', Haematology: '#e11d48', Immunoassay: '#8b5cf6', Microbiology: '#d97706', 'Clinical pathology': '#2563eb' };
+
+  const intake = { hours: ['6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'],
+                   counts: [18, 46, 72, 64, 58, 49, 38, 31, 27, 22, 19, 17, 15, 10] };
+
+  const tat = [
+    { dept: 'Haematology',        hours: 4.2,  target: 6 },
+    { dept: 'Biochemistry',       hours: 9.8,  target: 12 },
+    { dept: 'Immunoassay',        hours: 15.4, target: 18 },
+    { dept: 'Clinical pathology', hours: 5.1,  target: 6 },
+    { dept: 'Microbiology',       hours: 52,   target: 48 }
+  ];
+
+  const queue = [
+    { id: 'LB-24861', patient: 'K. Murugan',    test: 'Troponin I',             dept: 'Immunoassay',        priority: 'STAT',    received: '10:42', elapsed: '38 min', status: 'Analysing' },
+    { id: 'LB-24858', patient: 'S. Priya',      test: 'Complete blood count',   dept: 'Haematology',        priority: 'Routine', received: '10:31', elapsed: '49 min', status: 'Awaiting review' },
+    { id: 'LB-24855', patient: 'R. Venkatesh',  test: 'Lipid profile',          dept: 'Biochemistry',       priority: 'Routine', received: '10:20', elapsed: '1 h',    status: 'Analysing' },
+    { id: 'LB-24849', patient: 'A. Fathima',    test: 'Blood culture',          dept: 'Microbiology',       priority: 'Urgent',  received: '09:58', elapsed: '1 h 22 m', status: 'Incubating' },
+    { id: 'LB-24843', patient: 'M. Karthik',    test: 'HbA1c',                  dept: 'Biochemistry',       priority: 'Routine', received: '09:45', elapsed: '1 h 35 m', status: 'Rerun' },
+    { id: 'LB-24840', patient: 'L. Devi',       test: 'Thyroid profile',        dept: 'Immunoassay',        priority: 'Routine', received: '09:32', elapsed: '1 h 48 m', status: 'Analysing' },
+    { id: 'LB-24836', patient: 'P. Anand',      test: 'Urine routine',          dept: 'Clinical pathology', priority: 'Routine', received: '09:20', elapsed: '2 h',    status: 'Awaiting review' },
+    { id: 'LB-24829', patient: 'J. Selvi',      test: 'Electrolytes (Na, K, Cl)', dept: 'Biochemistry',     priority: 'STAT',    received: '09:05', elapsed: '2 h 15 m', status: 'Delayed' },
+    { id: 'LB-24817', patient: 'A. Rao',        test: 'Vitamin D & B12',        dept: 'Immunoassay',        priority: 'Routine', received: '09:40', elapsed: '1 h 40 m', status: 'Analysing' }
+  ];
+  const queueDepts = ['All', 'Biochemistry', 'Haematology', 'Immunoassay', 'Microbiology', 'Clinical pathology'];
+
+  let signoffs = [
+    { id: 'RPT-24858', patient: 'S. Priya',     test: 'Complete blood count',  analyser: 'HA-01', flag: '',                   ready: '10:58' },
+    { id: 'RPT-24836', patient: 'P. Anand',     test: 'Urine routine',         analyser: 'UA-01', flag: '',                   ready: '10:51' },
+    { id: 'RPT-24822', patient: 'N. Gopal',     test: 'Serum potassium',       analyser: 'BC-01', flag: 'Critical: K 6.4',    ready: '10:44' },
+    { id: 'RPT-24811', patient: 'V. Lakshmi',   test: 'Liver function test',   analyser: 'BC-01', flag: 'ALT 3× upper limit', ready: '10:37' }
+  ];
+
+  const analysers = [
+    { code: 'HA-01', name: 'Haematology analyser',   dept: 'Haematology',        status: 'Online',      tests: 214, reagent: 72, uptime: 99.8, service: '18 Oct' },
+    { code: 'BC-01', name: 'Chemistry analyser',     dept: 'Biochemistry',       status: 'Online',      tests: 486, reagent: 41, uptime: 99.6, service: '12 Oct' },
+    { code: 'BC-02', name: 'Chemistry analyser',     dept: 'Biochemistry',       status: 'Calibrating', tests: 128, reagent: 88, uptime: 98.9, service: '25 Oct' },
+    { code: 'IA-01', name: 'Immunoassay analyser',   dept: 'Immunoassay',        status: 'Online',      tests: 162, reagent: 18, uptime: 99.4, service: '9 Oct' },
+    { code: 'MB-01', name: 'Blood culture system',   dept: 'Microbiology',       status: 'Online',      tests: 36,  reagent: 64, uptime: 100,  service: '30 Oct' },
+    { code: 'UA-01', name: 'Urine analyser',         dept: 'Clinical pathology', status: 'Maintenance', tests: 58,  reagent: 55, uptime: 97.2, service: 'Today' }
+  ];
+  const analyserState = { Online: 'good', Calibrating: 'info', Maintenance: 'warn', Offline: 'bad' };
+
+  /* QC: 20 control runs per analyte; mean and SD come from the lab's own baseline */
+  const qcSets = {
+    'Glucose · Level 1':     { mean: 100,  sd: 2,    unit: 'mg/dL', analyser: 'BC-01', runs: [100.4, 99.1, 101.2, 98.7, 100.9, 102.3, 99.6, 100.2, 97.9, 101.5, 103.1, 100.7, 99.3, 104.6, 100.1, 98.8, 101.9, 99.7, 106.3, 100.5] },
+    'HbA1c · Level 2':       { mean: 9.2,  sd: .15,  unit: '%',     analyser: 'BC-02', runs: [9.21, 9.18, 9.3, 9.12, 9.24, 9.19, 9.27, 9.08, 9.22, 9.31, 9.17, 9.2, 9.26, 9.14, 9.23, 9.29, 9.16, 9.21, 9.25, 9.19] },
+    'TSH · Level 1':         { mean: 0.52, sd: .03,  unit: 'mIU/L', analyser: 'IA-01', runs: [.52, .51, .55, .53, .49, .52, .57, .58, .54, .52, .50, .51, .53, .55, .52, .49, .51, .54, .53, .52] },
+    'Haemoglobin · Level 1': { mean: 6.1,  sd: .1,   unit: 'g/dL',  analyser: 'HA-01', runs: [6.12, 6.05, 6.18, 6.1, 6.02, 6.14, 6.09, 6.21, 6.07, 6.11, 6.0, 6.13, 6.16, 6.08, 6.1, 6.04, 6.15, 6.11, 6.06, 6.12] }
+  };
+
+  const centres = [
+    { name: 'Salem main centre', area: 'Salem 636008',  samples: 248, home: 64, wait: 9,  staff: 14, cap: 300, hours: '6:30 AM – 9 PM' },
+    { name: 'Fairlands',         area: 'Salem 636016',  samples: 112, home: 38, wait: 6,  staff: 6,  cap: 140, hours: '7 AM – 8 PM' },
+    { name: 'Hasthampatti',      area: 'Salem 636007',  samples: 86,  home: 21, wait: 12, staff: 5,  cap: 90,  hours: '7 AM – 7 PM' },
+    { name: 'Attur collection point', area: 'Attur 636102', samples: 40, home: 9, wait: 4, staff: 2, cap: 80, hours: '7 AM – 1 PM' }
+  ];
+
+  const staff = [
+    { name: 'Dr. Meera Iyer',    role: 'Consultant pathologist', centre: 'Salem main centre', shift: 'Morning', access: 'Sign-off',   status: 'On duty' },
+    { name: 'Dr. Arjun Rao',     role: 'Pathologist',            centre: 'Salem main centre', shift: 'Evening', access: 'Sign-off',   status: 'Off shift' },
+    { name: 'Dr. Kavya Nair',    role: 'Microbiologist',         centre: 'Salem main centre', shift: 'Morning', access: 'Sign-off',   status: 'On duty' },
+    { name: 'Suresh Kumar',      role: 'Senior lab technician',  centre: 'Salem main centre', shift: 'Morning', access: 'Technician', status: 'On duty' },
+    { name: 'Divya Raman',       role: 'Lab technician',         centre: 'Fairlands',         shift: 'Morning', access: 'Technician', status: 'On duty' },
+    { name: 'Manoj Pillai',      role: 'Phlebotomist',           centre: 'Hasthampatti',      shift: 'Morning', access: 'Collection', status: 'On duty' },
+    { name: 'Revathi S.',        role: 'Phlebotomist (home)',    centre: 'Fairlands',         shift: 'Morning', access: 'Collection', status: 'On duty' },
+    { name: 'Farhan Ali',        role: 'Front desk',             centre: 'Salem main centre', shift: 'Evening', access: 'Front desk', status: 'Off shift' },
+    { name: 'Nisha Thomas',      role: 'Quality manager',        centre: 'Salem main centre', shift: 'Morning', access: 'Admin',      status: 'On duty' },
+    { name: 'Gokul Prasad',      role: 'Lab technician',         centre: 'Attur collection point', shift: 'Morning', access: 'Technician', status: 'On leave' }
+  ];
+  const accessColor = { Admin: '#0f766e', 'Sign-off': '#8b5cf6', Technician: '#2563eb', Collection: '#d97706', 'Front desk': '#64748b' };
+
+  const criticals = [
+    { id: 'LB-24822', patient: 'N. Gopal',   value: 'Potassium 6.4 mmol/L', doctor: 'Dr. S. Babu',   time: '10:44', called: false },
+    { id: 'LB-24809', patient: 'R. Meena',   value: 'Glucose 42 mg/dL',     doctor: 'Dr. P. Kumar',  time: '10:12', called: false },
+    { id: 'LB-24781', patient: 'T. Anbu',    value: 'Haemoglobin 5.9 g/dL', doctor: 'Dr. S. Babu',   time: '09:21', called: true }
+  ];
+
+  let auditTrail = [
+    { time: '10:58', actor: 'System',          action: 'Queued report for sign-off',     target: 'RPT-24858 · CBC',          scope: 'Haematology' },
+    { time: '10:46', actor: 'Dr. Meera Iyer',  action: 'Released report',                target: 'RPT-24790 · Lipid profile', scope: 'Biochemistry' },
+    { time: '10:30', actor: 'Nisha Thomas',    action: 'Rejected QC run',                target: 'Glucose L1 on BC-01 (+3.2 SD)', scope: 'Quality' },
+    { time: '10:05', actor: 'Suresh Kumar',    action: 'Loaded reagent pack',            target: 'BC-01 · Glucose', scope: 'Biochemistry' },
+    { time: '09:48', actor: 'System',          action: 'Flagged critical value',         target: 'LB-24809 · Glucose 42 mg/dL', scope: 'Biochemistry' },
+    { time: '09:20', actor: 'Farhan Ali',      action: 'Registered walk-in patient',     target: 'LB-24836', scope: 'Salem main centre' },
+    { time: '08:40', actor: 'System',          action: 'Started maintenance window',     target: 'UA-01 urine analyser', scope: 'Clinical pathology' },
+    { time: 'Yesterday', actor: 'Admin (You)', action: 'Changed access level',           target: 'Divya Raman → Technician', scope: 'Staff' }
+  ];
+
+  const clients = [
+    { name: 'Salem District Hospital',     model: 'Hospital referral',  monthly: 412000, next: '1 Nov', state: 'Paid' },
+    { name: 'Kaveri Insurance TPA',        model: 'Insurance (cashless)', monthly: 286000, next: '5 Nov', state: 'Sent' },
+    { name: 'Sunrise Textiles Ltd.',       model: 'Corporate wellness', monthly: 148000, next: '28 Oct', state: 'Overdue' },
+    { name: 'Lotus Multispeciality Clinic',model: 'Clinic referral',    monthly: 96000,  next: '1 Nov', state: 'Paid' },
+    { name: 'Walk-in & home collection',   model: 'Retail (UPI / card)', monthly: 1184000, next: 'Daily', state: 'Paid' }
+  ];
+  const deptRevenue = [
+    { dept: 'Biochemistry', value: 812000 }, { dept: 'Immunoassay', value: 604000 }, { dept: 'Haematology', value: 318000 },
+    { dept: 'Microbiology', value: 226000 }, { dept: 'Clinical pathology', value: 166000 }
+  ];
+
+  const stateClass = {
+    'Analysing': 'info', 'Awaiting review': 'warn', 'Incubating': 'info', 'Rerun': 'warn', 'Delayed': 'bad',
+    'Online': 'good', 'Calibrating': 'info', 'Maintenance': 'warn', 'Offline': 'bad',
+    'On duty': 'good', 'Off shift': 'muted', 'On leave': 'warn',
+    'Paid': 'good', 'Sent': 'info', 'Overdue': 'bad', 'Open': 'good'
+  };
+
+  /* =========================================================
+     NAVIGATION
+     ========================================================= */
+  const navGroups = [
+    { label: 'Operations', items: [
+      { label: 'Overview',        id: 'dashboard', icon: 'grid' },
+      { label: 'Sample queue',    id: 'queue',     icon: 'flask' },
+      { label: 'Report sign-off', id: 'signoff',   icon: 'sign' },
+      { label: 'Analysers',       id: 'analysers', icon: 'cpu' } ] },
+    { label: 'Quality', items: [
+      { label: 'Quality control', id: 'qc',        icon: 'qc' },
+      { label: 'Audit log',       id: 'audit',     icon: 'log' } ] },
+    { label: 'Business', items: [
+      { label: 'Centres',         id: 'centres',   icon: 'pin' },
+      { label: 'Staff',           id: 'staff',     icon: 'users' },
+      { label: 'Billing',         id: 'billing',   icon: 'rupee' } ] },
+    { label: 'Controls', items: [
+      { label: 'Security',        id: 'security',  icon: 'lock' },
+      { label: 'Settings',        id: 'settings',  icon: 'gear' } ] }
+  ];
+
+  const pageMap = {
+    dashboard: { title: 'Overview',        sub: 'Samples, sign-offs, analysers and quality across every centre today' },
+    queue:     { title: 'Sample queue',    sub: 'Every sample in the lab right now, oldest first' },
+    signoff:   { title: 'Report sign-off', sub: 'Results waiting for a pathologist to release or send back' },
+    analysers: { title: 'Analysers',       sub: 'Status, reagent levels and service dates for each instrument' },
+    qc:        { title: 'Quality control', sub: 'Daily control runs plotted against the lab’s own mean and SD' },
+    audit:     { title: 'Audit log',       sub: 'Every release, QC decision and access change, newest first' },
+    centres:   { title: 'Centres',         sub: 'Collection centres, today’s load and waiting times' },
+    staff:     { title: 'Staff',           sub: 'Who is on shift and what they can do in the system' },
+    billing:   { title: 'Billing',         sub: 'Revenue by department and what each client is invoiced' },
+    security:  { title: 'Security',        sub: 'Access rules for everyone who handles patient data' },
+    settings:  { title: 'Settings',        sub: 'Your profile and preferences' }
+  };
+  const pageActions = {
+    dashboard: `<button class="btn btn-ghost" onclick="go404()">${ico('download')}Shift report</button><button class="btn btn-solid" onclick="go404()">${ico('plus')}Register sample</button>`,
+    queue:     `<button class="btn btn-solid" onclick="go404()">${ico('plus')}Register sample</button>`,
+    analysers: `<button class="btn btn-ghost" onclick="go404()">${ico('wrench')}Service schedule</button>`,
+    qc:        `<button class="btn btn-ghost" onclick="go404()">${ico('download')}Monthly QC report</button>`,
+    audit:     `<button class="btn btn-ghost" onclick="go404()">${ico('download')}Export CSV</button>`,
+    centres:   `<button class="btn btn-solid" onclick="go404()">${ico('plus')}Add centre</button>`,
+    staff:     `<button class="btn btn-solid" onclick="go404()">${ico('plus')}Add staff member</button>`,
+    billing:   `<button class="btn btn-solid" onclick="go404()">${ico('plus')}New invoice</button>`
+  };
+
+  /* =========================================================
+     SIGNED-IN USER (from login page → localStorage "user")
+     ========================================================= */
+  const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  const USER_KEYS = ['user', 'currentUser', 'loggedInUser', 'authUser', 'userData', 'profile', 'account', 'session', 'userEmail', 'email'];
+  let foundUserKey = null;
+
+  function asEmail(v) { return typeof v === 'string' && EMAIL_RE.test(v.trim()) ? v.trim() : null; }
+  function findEmailIn(obj, depth) {
+    if (!obj || depth > 4) return null;
+    if (typeof obj === 'string') {
+      const e = asEmail(obj); if (e) return { email: e };
+      try { return findEmailIn(JSON.parse(obj), depth + 1); } catch (err) { return null; }
+    }
+    if (typeof obj !== 'object') return null;
+    for (const k in obj) { const e = asEmail(obj[k]); if (e) return Object.assign({}, obj, { email: e }); }
+    for (const k in obj) { const hit = findEmailIn(obj[k], depth + 1); if (hit) return Object.assign({}, obj, hit); }
+    return null;
+  }
+  function getCurrentUser() {
+    const stores = [];
+    try { stores.push(localStorage); } catch (e) {}
+    try { stores.push(sessionStorage); } catch (e) {}
+    for (const s of stores) { try { if (s.getItem('isAuthenticated') === 'false') return null; } catch (e) {} }
+    for (const s of stores) {
+      for (const key of USER_KEYS) {
+        let hit = null;
+        try { hit = findEmailIn(s.getItem(key), 0); } catch (e) {}
+        if (hit) { foundUserKey = key; return hit; }
+      }
+    }
+    return null;
+  }
+
+  const currentUser = getCurrentUser();
+  const currentEmail = currentUser ? currentUser.email : '';
+  const storedName = currentUser && typeof currentUser.name === 'string' ? currentUser.name : '';
+  const currentUsername = storedName || (currentEmail ? currentEmail.split('@')[0] : '');
+  const currentInitial = ((currentUsername || currentEmail || '?').charAt(0) || '?').toUpperCase();
+  const currentRole = currentUser ? (currentUser.role === 'admin' ? 'Lab administrator' : 'Lab staff') : 'Not signed in';
+
+  function paintUserChrome() {
+    const name = currentUsername || 'Signed out';
+    const email = currentEmail || '—';
+    document.querySelectorAll('#sidebar-user-avatar, #topbar-user-avatar').forEach(el => el.textContent = currentInitial);
+    const sName = document.getElementById('sidebar-user-name');
+    sName.textContent = name; sName.title = name;
+    const sEmail = document.getElementById('sidebar-user-email');
+    sEmail.textContent = email; sEmail.title = email;
+    document.getElementById('topbar-user-name').textContent = name;
+    document.getElementById('topbar-user-email').textContent = email;
+    document.getElementById('topbar-user-role').textContent = currentRole;
+  }
+
+  function logout() {
+    const keys = ['user', 'isAuthenticated', 'activeNav', 'adminNav', 'settings', 'adminSettings'].concat(USER_KEYS);
+    if (foundUserKey && keys.indexOf(foundUserKey) === -1) keys.push(foundUserKey);
+    keys.forEach(k => {
+      try { localStorage.removeItem(k); } catch (e) {}
+      try { sessionStorage.removeItem(k); } catch (e) {}
+    });
+    window.location.href = 'login.html';
+  }
+
+  /* =========================================================
+     STATE  (admin-only keys so it never clashes with the
+     patient dashboard's saved page and settings)
+     ========================================================= */
+  function readStore(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function writeStore(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function loadSettings() {
+    const d = {
+      criticalSms: true, dailyDigest: true, qcAlerts: true, compactRows: false, language: 'English',
+      twoFactor: true, releaseByPathologist: true, maskNames: true, ipAllowlist: false, sessionTimeout: '30 minutes'
+    };
+    try { const raw = readStore('adminSettings'); if (raw) return Object.assign(d, JSON.parse(raw)); } catch (e) {}
+    return d;
+  }
+  function saveSettings() { writeStore('adminSettings', JSON.stringify(state.settings)); }
+
+  const savedNav = readStore('adminNav');
+  let state = {
+    activeNav: savedNav && pageMap[savedNav] ? savedNav : 'dashboard',
+    queueDept: 'All',
+    staffSearch: '',
+    qcSet: 'Glucose · Level 1',
+    settings: loadSettings()
+  };
+
+  function fmt(n) { return n.toLocaleString('en-IN'); }
+  function rupees(n) { return '₹' + fmt(n); }
+  function lakh(n) { return n >= 100000 ? '₹' + (n / 100000).toFixed(2) + ' L' : '₹' + Math.round(n / 1000) + 'k'; }
+  function go404() { window.location.href = '404.html'; }
+  function pill(text) { return `<span class="state state-${stateClass[text] || 'muted'}">${text}</span>`; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function initials(n) { return n.replace(/^Dr\.\s*/, '').split(/[\s.]+/).filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase(); }
+
+  let toastTimer = null;
+  function toast(msg, kind) {
+    const t = document.getElementById('toast');
+    t.innerHTML = `${ico(kind === 'no' ? 'undo' : 'check')}<span>${esc(msg)}</span>`;
+    t.className = 'toast show ' + (kind === 'no' ? 'toast-no' : 'toast-yes');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  /* =========================================================
+     SHARED PIECES
+     ========================================================= */
+  function kpiRow(items) {
+    return `<section class="kpis">${items.map(k => `
+      <article class="kpi anim" style="--c:${k.color || '#0d9488'}" ${k.nav ? `data-nav="${k.nav}"` : 'onclick="go404()"'}>
+        <div class="kpi-top">
+          <span class="kpi-ico">${ico(k.icon || 'grid')}</span>
+          ${k.trend ? `<span class="kpi-trend ${k.trend.good === false ? 'trend-bad' : 'trend-good'}">${k.trend.text}</span>` : ''}
+        </div>
+        <span class="kpi-value" ${k.count === false ? '' : 'data-count'}>${k.value}</span>
+        <span class="kpi-label">${k.label}</span>
+        ${k.note ? `<span class="kpi-note">${k.note}</span>` : ''}
+      </article>`).join('')}</section>`;
+  }
+  function card(o, body) {
+    return `<section class="card anim ${o.cls || ''}">
+      <header class="card-head">
+        <div>
+          ${o.kicker ? `<span class="card-kicker">${o.kicker}</span>` : ''}
+          <h2>${ico(o.icon || 'grid', 'head-ico')}${o.title}</h2>
+          ${o.sub ? `<p${o.subId ? ` id="${o.subId}"` : ''}>${o.sub}</p>` : ''}
+        </div>
+        ${o.aside || ''}
+      </header>
+      ${body}
+    </section>`;
+  }
+  function chips(list, current, cls) {
+    return `<div class="chip-row">${list.map(c => `<button class="chip ${cls} ${current === c ? 'chip-on' : ''}" data-filter="${c}">${c}</button>`).join('')}</div>`;
+  }
+  function ring(pct, color, label) {
+    const r = 34, c = 2 * Math.PI * r;
+    return `<div class="ring">
+      <svg viewBox="0 0 80 80" aria-hidden="true">
+        <circle cx="40" cy="40" r="${r}" class="ring-bg"/>
+        <circle cx="40" cy="40" r="${r}" class="ring-fg" stroke="${color}" stroke-dasharray="${c.toFixed(1)}" style="stroke-dashoffset:${(c * (1 - pct / 100)).toFixed(1)}" data-dash="${(c * (1 - pct / 100)).toFixed(1)}" data-full="${c.toFixed(1)}"/>
+      </svg>
+      <span class="ring-val">${pct}%</span>
+      ${label ? `<span class="ring-label">${label}</span>` : ''}
+    </div>`;
+  }
+  function trailHtml(list) {
+    return list.map(a => `
+      <li class="trail-item row-anim" onclick="go404()">
+        <span class="trail-dot ${a.actor === 'System' ? 'auto' : a.actor === 'Admin (You)' ? 'you' : ''}"></span>
+        <span class="trail-body">
+          <span class="trail-line"><b>${esc(a.actor)}</b> ${esc(a.action.toLowerCase())} — ${esc(a.target)}</span>
+          <span class="trail-meta">${a.time} · ${a.scope}</span>
+        </span>
+      </li>`).join('');
+  }
+
+  /* =========================================================
+     OVERVIEW
+     ========================================================= */
+  function signoffHtml(limit) {
+    const list = limit ? signoffs.slice(0, limit) : signoffs;
+    if (!signoffs.length) return `<div class="empty empty--done">${ico('check')}<span>Every report is signed off. Nice.</span></div>`;
+    return `<ul class="approvals">${list.map(r => `
+      <li class="approval row-anim" data-req="${r.id}">
+        <span class="avatar sm ${r.flag ? 'avatar--flag' : ''}">${initials(r.patient)}</span>
+        <span class="approval-body">
+          <span class="approval-who">${r.test} <em>${r.patient}</em></span>
+          ${r.flag ? `<span class="approval-flag">${ico('alert', 'flag-ico')}${r.flag}</span>` : `<span class="approval-what">All values within limits</span>`}
+          <span class="approval-when"><span class="mono">${r.id}</span> · ${r.analyser} · ready ${r.ready}</span>
+        </span>
+        <span class="approval-actions">
+          <button class="act act-yes" data-approve="${r.id}" aria-label="Release ${r.id}" title="Release report">${ico('check')}</button>
+          <button class="act act-no" data-decline="${r.id}" aria-label="Send ${r.id} back for rerun" title="Send back for rerun">${ico('undo')}</button>
+        </span>
+      </li>`).join('')}</ul>`;
+  }
+
+  function intakeChart() {
+    const max = Math.max(...intake.counts);
+    const total = intake.counts.reduce((a, b) => a + b, 0);
+    const peak = intake.counts.indexOf(max);
+    return `<div class="bars" role="img" aria-label="Samples received per hour today">
+        ${[0, 25, 50, 75].map(v => `<span class="bars-grid" style="bottom:${v / 80 * 100}%"><em>${v}</em></span>`).join('')}
+        <div class="bars-cols">${intake.counts.map((n, i) => `
+          <div class="bar-col" tabindex="0" data-tip="${intake.hours[i]}:00–${+intake.hours[i] + 1}:00 · ${n} samples">
+            <span class="bar ${i === peak ? 'bar-peak' : ''}" data-h="${(n / 80 * 100).toFixed(1)}" style="height:${(n / 80 * 100).toFixed(1)}%"></span>
+            <span class="bar-x">${intake.hours[i]}</span>
+          </div>`).join('')}</div>
+      </div>
+      <div class="bars-foot"><span><b data-count>${total}</b> samples received today</span><span class="trend-good">Peak ${intake.hours[peak]}:00–${+intake.hours[peak] + 1}:00</span></div>`;
+  }
+
+  function tatHtml() {
+    const top = Math.max(...tat.map(t => Math.max(t.hours, t.target))) * 1.1;
+    return `<ul class="tat">${tat.map(t => {
+      const over = t.hours > t.target;
+      return `<li class="tat-row row-anim">
+        <div class="tat-top"><span>${t.dept}</span><span class="${over ? 'tat-over' : 'tat-ok'}"><b>${t.hours} h</b> / ${t.target} h target</span></div>
+        <span class="tat-track" data-tip="${t.dept}: ${t.hours} h average, target ${t.target} h" tabindex="0">
+          <span class="tat-fill ${over ? 'is-over' : ''}" data-w="${(t.hours / top * 100).toFixed(1)}" style="width:${(t.hours / top * 100).toFixed(1)}%"></span>
+          <i class="tat-target" style="left:${(t.target / top * 100).toFixed(1)}%"></i>
+        </span>
+      </li>`;
+    }).join('')}</ul>`;
+  }
+
+  function criticalHtml() {
+    return `<ul class="crit-list">${criticals.map(c => `
+      <li class="crit row-anim ${c.called ? 'is-done' : ''}" onclick="go404()">
+        <span class="crit-ico">${ico(c.called ? 'check' : 'phone')}</span>
+        <span class="crit-body"><span class="crit-val">${c.value}</span><span class="crit-sub">${c.patient} · <span class="mono">${c.id}</span> · ${c.doctor} · ${c.time}</span></span>
+        <span class="state state-${c.called ? 'good' : 'bad'}">${c.called ? 'Doctor informed' : 'Call doctor'}</span>
+      </li>`).join('')}</ul>`;
+  }
+
+  function renderDashboard() {
+    const online = analysers.filter(a => a.status === 'Online').length;
+    const pendingCalls = criticals.filter(c => !c.called).length;
+    const kpis = kpiRow([
+      { label: 'Samples received today', value: '486', icon: 'flask', nav: 'queue', trend: { text: '▲ 8.4%' }, note: 'vs last Saturday' },
+      { label: 'Reports released',       value: '412', icon: 'sign',  nav: 'signoff', color: '#2563eb', note: `${signoffs.length} waiting for sign-off` },
+      { label: 'Average turnaround',     value: '11.6 h', icon: 'clock', color: '#8b5cf6', trend: { text: 'On target' }, note: 'target 12 h' },
+      { label: 'Critical values to call', value: String(pendingCalls), icon: 'phone', color: '#e11d48', trend: { text: 'Urgent', good: false }, note: 'call within 30 minutes' }
+    ]);
+
+    const analyserMinis = analysers.slice(0, 4).map(a => `
+      <div class="site-mini row-anim" onclick="go404()" data-nav="analysers">
+        ${ring(a.reagent, a.reagent < 25 ? '#e11d48' : a.reagent < 50 ? '#d97706' : '#0d9488')}
+        <span class="site-mini-city">${a.code}</span>
+        <span class="site-mini-sub">${a.status} · reagent</span>
+      </div>`).join('');
+
+    return `${kpis}
+      <div class="grid grid-a">
+        ${card({ kicker: 'Intake', title: 'Samples received per hour', sub: 'All centres, today · hover a bar for the count', icon: 'flask', cls: 'span-2' }, intakeChart())}
+        ${card({ kicker: 'Action', title: 'Report sign-off', sub: 'Release, or send back for a rerun — both are logged', icon: 'sign', aside: `<span class="count-badge" id="approval-count">${signoffs.length}</span>` }, `<div id="approvals-box">${signoffHtml()}</div>`)}
+      </div>
+      <div class="grid grid-b">
+        ${card({ kicker: 'Turnaround', title: 'Turnaround by department', sub: 'Average hours today · line marks the target', icon: 'clock' }, tatHtml())}
+        ${card({ kicker: 'Instruments', title: 'Reagent levels', sub: `${online} of ${analysers.length} analysers online · red means reorder now`, icon: 'cpu', aside: `<button class="link-btn" data-nav="analysers">All analysers →</button>` }, `<div class="site-minis">${analyserMinis}</div>`)}
+      </div>
+      <div class="grid grid-b">
+        ${card({ kicker: 'Patient safety', title: 'Critical values', sub: 'Phone the referring doctor and record the call', icon: 'alert' }, criticalHtml())}
+        ${card({ kicker: 'Log', title: 'Recent activity', sub: 'Latest entries on the audit log', icon: 'log', aside: `<button class="link-btn" data-nav="audit">Full log →</button>` }, `<ul class="trail" id="overview-trail">${trailHtml(auditTrail.slice(0, 5))}</ul>`)}
+      </div>`;
+  }
+
+  /* =========================================================
+     SAMPLE QUEUE
+     ========================================================= */
+  function renderQueue() {
+    const list = state.queueDept === 'All' ? queue : queue.filter(q => q.dept === state.queueDept);
+    const kpis = kpiRow([
+      { label: 'Samples in the lab', value: String(queue.length), icon: 'flask' },
+      { label: 'STAT / urgent',      value: String(queue.filter(q => q.priority !== 'Routine').length), icon: 'alert', color: '#e11d48', note: 'jump the queue' },
+      { label: 'Awaiting review',    value: String(queue.filter(q => q.status === 'Awaiting review').length), icon: 'sign', color: '#d97706' },
+      { label: 'Delayed or rerun',   value: String(queue.filter(q => q.status === 'Delayed' || q.status === 'Rerun').length), icon: 'clock', color: '#8b5cf6' }
+    ]);
+    const rows = list.map(q => `
+      <tr class="row-anim" onclick="go404()">
+        <td class="mono" data-label="Sample">${q.id}</td>
+        <td class="stack" data-label="Test"><span class="t-name">${q.test}</span><span class="t-sub">${q.patient}</span></td>
+        <td data-label="Department"><span class="tag" style="--c:${deptColor[q.dept]}">${q.dept}</span></td>
+        <td data-label="Priority"><span class="prio prio-${q.priority.toLowerCase()}">${q.priority}</span></td>
+        <td data-label="In lab">${q.received} · ${q.elapsed}</td>
+        <td data-label="Status">${pill(q.status)}</td>
+      </tr>`).join('');
+    return `${kpis}${card({ kicker: 'Live', title: 'Samples in progress', sub: `${list.length} sample${list.length === 1 ? '' : 's'} shown`, icon: 'flask', cls: 'card-table', aside: chips(queueDepts, state.queueDept, 'queue-filter') },
+      `<div class="table-wrap"><table class="table">
+        <thead><tr><th>Sample</th><th>Test</th><th>Department</th><th>Priority</th><th>Received · in lab</th><th>Status</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" class="empty">No samples in this department right now.</td></tr>'}</tbody>
+      </table></div>`)}`;
+  }
+
+  /* =========================================================
+     REPORT SIGN-OFF
+     ========================================================= */
+  function renderSignoff() {
+    const kpis = kpiRow([
+      { label: 'Waiting for sign-off', value: String(signoffs.length), icon: 'sign' },
+      { label: 'With flagged values',  value: String(signoffs.filter(s => s.flag).length), icon: 'alert', color: '#e11d48' },
+      { label: 'Released today',       value: '412', icon: 'check', color: '#10b981' },
+      { label: 'Sent back for rerun',  value: '6', icon: 'undo', color: '#d97706', note: 'today' }
+    ]);
+    return `${kpis}${card({ kicker: 'Pathologist', title: 'Reports to review', sub: 'Release to send the report to the patient and doctor, or send back for a rerun', icon: 'sign', aside: `<span class="count-badge" id="approval-count">${signoffs.length}</span>` }, `<div id="approvals-box">${signoffHtml()}</div>`)}`;
+  }
+
+  /* =========================================================
+     ANALYSERS
+     ========================================================= */
+  function renderAnalysers() {
+    const kpis = kpiRow([
+      { label: 'Analysers',          value: String(analysers.length), icon: 'cpu' },
+      { label: 'Online',             value: String(analysers.filter(a => a.status === 'Online').length), icon: 'check', color: '#10b981' },
+      { label: 'Tests run today',    value: fmt(analysers.reduce((a, b) => a + b.tests, 0)), icon: 'pulse', color: '#2563eb' },
+      { label: 'Reagent to reorder', value: String(analysers.filter(a => a.reagent < 25).length), icon: 'drop', color: '#e11d48', note: 'IA-01 at 18%' }
+    ]);
+    const cards = analysers.map(a => `
+      <article class="site row-anim" onclick="go404()">
+        <header>
+          <span class="site-pin" style="--c:${deptColor[a.dept]}">${ico('cpu')}</span>
+          <span><span class="site-city">${a.code} · ${a.name}</span><span class="site-country">${a.dept}</span></span>
+          ${pill(a.status)}
+        </header>
+        <div class="site-body">
+          ${ring(a.reagent, a.reagent < 25 ? '#e11d48' : a.reagent < 50 ? '#d97706' : '#0d9488', 'reagent left')}
+          <dl class="site-meta">
+            <div><dt>Tests today</dt><dd>${a.tests}</dd></div>
+            <div><dt>Uptime, 30 days</dt><dd>${a.uptime}%</dd></div>
+            <div><dt>Next service</dt><dd>${a.service}</dd></div>
+            <div><dt>Last QC</dt><dd>${a.code === 'BC-01' ? 'Rejected 10:30' : 'Passed 06:50'}</dd></div>
+          </dl>
+        </div>
+      </article>`).join('');
+    return `${kpis}${card({ kicker: 'Instruments', title: 'All analysers', sub: 'Ring shows reagent left in the loaded pack', icon: 'cpu' }, `<div class="site-grid">${cards}</div>`)}`;
+  }
+
+  /* =========================================================
+     QUALITY CONTROL — Levey-Jennings chart
+     ========================================================= */
+  function qcFlag(z) { const a = Math.abs(z); return a > 3 ? 'reject' : a > 2 ? 'warn' : 'ok'; }
+  function ljChart(key) {
+    const s = qcSets[key], n = s.runs.length;
+    const zs = s.runs.map(v => (v - s.mean) / s.sd);
+    const yp = z => (z + 4) / 8 * 100;                 // plot covers -4 SD … +4 SD
+    const xp = i => (i / (n - 1) * 100);
+    const pts = zs.map((z, i) => `${(xp(i) * 6).toFixed(1)},${(220 - yp(Math.max(-4, Math.min(4, z))) * 2.2).toFixed(1)}`).join(' ');
+    const lines = [3, 2, 1, 0, -1, -2, -3].map(k => `<span class="lj-line lj-${Math.abs(k)}" style="bottom:${yp(k)}%"><em>${k === 0 ? 'Mean' : (k > 0 ? '+' : '−') + Math.abs(k) + ' SD'}</em></span>`).join('');
+    const dots = zs.map((z, i) => {
+      const f = qcFlag(z);
+      return `<div class="lj-col" style="left:${xp(i).toFixed(2)}%" tabindex="0" data-tip="Run ${i + 1} · ${s.runs[i]} ${s.unit} · ${z >= 0 ? '+' : ''}${z.toFixed(1)} SD${f === 'reject' ? ' · rejected (1-3s)' : f === 'warn' ? ' · warning (1-2s)' : ''}">
+        <span class="lj-dot lj-${f}" style="bottom:${yp(Math.max(-4, Math.min(4, z))).toFixed(2)}%"></span></div>`;
+    }).join('');
+    return `<div class="lj" role="img" aria-label="Levey-Jennings chart for ${key}">
+        <div class="lj-plot">
+          <span class="lj-zone"></span>
+          ${lines}
+          <svg class="lj-svg" viewBox="0 0 600 220" preserveAspectRatio="none"><polyline class="lj-path" points="${pts}"/></svg>
+          <div class="lj-cols">${dots}</div>
+        </div>
+        <div class="lj-x"><span style="left:0%">Run 1</span><span style="left:50%">Run 10</span><span style="left:100%">Run 20</span></div>
+      </div>`;
+  }
+  function renderQc() {
+    const s = qcSets[state.qcSet];
+    const zs = s.runs.map(v => (v - s.mean) / s.sd);
+    const rejects = zs.filter(z => qcFlag(z) === 'reject').length;
+    const warns = zs.filter(z => qcFlag(z) === 'warn').length;
+    const mean = s.runs.reduce((a, b) => a + b, 0) / s.runs.length;
+    const sd = Math.sqrt(s.runs.reduce((a, b) => a + (b - mean) ** 2, 0) / (s.runs.length - 1));
+    const cv = sd / mean * 100;
+    const kpis = kpiRow([
+      { label: 'Runs this month', value: String(s.runs.length), icon: 'qc', note: `on ${s.analyser}` },
+      { label: 'Observed CV',     value: cv.toFixed(1) + '%', icon: 'pulse', color: cv > 3 ? '#d97706' : '#10b981', note: 'lower is more precise' },
+      { label: 'Warnings (1-2s)', value: String(warns), icon: 'alert', color: '#d97706' },
+      { label: 'Rejected (1-3s)', value: String(rejects), icon: 'x', color: '#e11d48', note: rejects ? 'patient runs held until rerun' : 'none this month' }
+    ]);
+    const all = Object.keys(qcSets).map(k => {
+      const q = qcSets[k], z = q.runs.map(v => (v - q.mean) / q.sd);
+      const r = z.filter(v => qcFlag(v) === 'reject').length, w = z.filter(v => qcFlag(v) === 'warn').length;
+      return `<li class="check-mini row-anim">
+        <span class="check-ico ${r ? 'bad' : w ? 'warn' : 'ok'}">${ico(r ? 'x' : w ? 'alert' : 'check')}</span>
+        <span class="check-mini-name">${k} <em>${q.analyser}</em></span>
+        <span class="check-mini-metric">${r ? r + ' rejected' : w ? w + ' warning' + (w > 1 ? 's' : '') : 'All in control'}</span>
+      </li>`;
+    }).join('');
+    return `${kpis}
+      ${card({ kicker: 'Levey-Jennings', title: state.qcSet, sub: `Target ${s.mean} ${s.unit}, 1 SD = ${s.sd} ${s.unit} · amber beyond ±2 SD, red beyond ±3 SD`, icon: 'qc', aside: chips(Object.keys(qcSets), state.qcSet, 'qc-filter') }, ljChart(state.qcSet))}
+      ${card({ kicker: 'Summary', title: 'All control materials', sub: 'This month, Westgard 1-2s and 1-3s rules', icon: 'shield' }, `<ul class="check-minis">${all}</ul>`)}`;
+  }
+
+  /* =========================================================
+     AUDIT LOG
+     ========================================================= */
+  function renderAudit() {
+    return card({ kicker: 'Log', title: 'Audit log', sub: 'Every release, QC decision and access change, most recent first', icon: 'log',
+      aside: `<div class="trail-key"><span><i class="you"></i>You</span><span><i></i>Staff</span><span><i class="auto"></i>System</span></div>` },
+      `<ul class="trail">${trailHtml(auditTrail)}</ul>`);
+  }
+
+  /* =========================================================
+     CENTRES
+     ========================================================= */
+  function renderCentres() {
+    const total = centres.reduce((a, c) => a + c.samples, 0);
+    const kpis = kpiRow([
+      { label: 'Centres open',        value: String(centres.length), icon: 'pin' },
+      { label: 'Samples collected',   value: String(total), icon: 'flask', color: '#2563eb' },
+      { label: 'Home collections',    value: String(centres.reduce((a, c) => a + c.home, 0)), icon: 'home', color: '#8b5cf6' },
+      { label: 'Average wait',        value: '8 min', icon: 'clock', color: '#d97706', note: 'walk-in to sample drawn' }
+    ]);
+    const cards = centres.map(c => {
+      const pct = Math.round(c.samples / c.cap * 100);
+      return `<article class="site row-anim" onclick="go404()">
+        <header>
+          <span class="site-pin">${ico('pin')}</span>
+          <span><span class="site-city">${c.name}</span><span class="site-country">${c.area} · ${c.hours}</span></span>
+          ${pill('Open')}
+        </header>
+        <div class="site-body">
+          ${ring(pct, pct >= 90 ? '#d97706' : '#0d9488', 'of daily capacity')}
+          <dl class="site-meta">
+            <div><dt>Samples today</dt><dd>${c.samples}</dd></div>
+            <div><dt>Home collections</dt><dd>${c.home}</dd></div>
+            <div><dt>Average wait</dt><dd>${c.wait} min</dd></div>
+            <div><dt>Staff on duty</dt><dd>${c.staff}</dd></div>
+          </dl>
+        </div>
+      </article>`;
+    }).join('');
+    return `${kpis}${card({ kicker: 'Network', title: 'Collection centres', sub: 'Amber means a centre is 90% full or more today', icon: 'pin' }, `<div class="site-grid">${cards}</div>`)}`;
+  }
+
+  /* =========================================================
+     STAFF — every word typed must match somewhere in the row.
+     Typing swaps only the rows and the count line, so the
+     caret stays put.
+     ========================================================= */
+  function staffTerms() { return state.staffSearch.toLowerCase().split(/\s+/).filter(Boolean); }
+  function staffList() {
+    const terms = staffTerms();
+    if (!terms.length) return staff.slice();
+    return staff.filter(p => {
+      const hay = [p.name, p.role, p.centre, p.shift, p.access, p.status].join(' ').toLowerCase();
+      return terms.every(t => hay.includes(t));
+    });
+  }
+  function staffRowsHtml(list) {
+    if (!list.length) return '<tr><td colspan="5" class="empty">Nobody matches that search.</td></tr>';
+    return list.map(p => `
+      <tr class="row-anim" onclick="go404()">
+        <td class="stack" data-label="Name"><span class="t-name"><span class="avatar xs">${initials(p.name)}</span>${p.name}</span><span class="t-sub">${p.role}</span></td>
+        <td data-label="Centre">${p.centre}</td>
+        <td data-label="Shift">${p.shift}</td>
+        <td data-label="Access"><span class="tag" style="--c:${accessColor[p.access]}">${p.access}</span></td>
+        <td data-label="Status">${pill(p.status)}</td>
+      </tr>`).join('');
+  }
+  function staffSubText(list) {
+    return staffTerms().length ? `Showing ${list.length} of ${staff.length} staff` : 'Everyone with a login, across all centres';
+  }
+  function updateStaffRows() {
+    const body = document.getElementById('staff-rows');
+    if (!body) return;
+    const list = staffList();
+    body.innerHTML = staffRowsHtml(list);
+    const sub = document.getElementById('staff-sub');
+    if (sub) sub.textContent = staffSubText(list);
+  }
+  function renderStaff() {
+    const list = staffList();
+    const kpis = kpiRow([
+      { label: 'Staff with a login', value: String(staff.length), icon: 'users' },
+      { label: 'On duty now',        value: String(staff.filter(p => p.status === 'On duty').length), icon: 'check', color: '#10b981' },
+      { label: 'Can sign off reports', value: String(staff.filter(p => p.access === 'Sign-off').length), icon: 'sign', color: '#8b5cf6' },
+      { label: 'On leave',           value: String(staff.filter(p => p.status === 'On leave').length), icon: 'clock', color: '#d97706' }
+    ]);
+    return `${kpis}${card({ kicker: 'People', title: 'Staff and access', sub: staffSubText(list), subId: 'staff-sub', icon: 'users', cls: 'card-table',
+        aside: `<label class="finder finder-inline">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>
+          <input id="staff-search-input" placeholder="Name, role, centre, access…" aria-label="Search staff" value="${esc(state.staffSearch)}">
+        </label>` },
+      `<div class="table-wrap"><table class="table">
+        <thead><tr><th>Name</th><th>Centre</th><th>Shift</th><th>Access</th><th>Status</th></tr></thead>
+        <tbody id="staff-rows">${staffRowsHtml(list)}</tbody>
+      </table></div>`)}`;
+  }
+
+  /* =========================================================
+     BILLING
+     ========================================================= */
+  function renderBilling() {
+    const monthly = clients.reduce((a, b) => a + b.monthly, 0);
+    const outstanding = clients.filter(c => c.state !== 'Paid').reduce((a, b) => a + b.monthly, 0);
+    const maxDept = Math.max(...deptRevenue.map(d => d.value));
+    const maxClient = Math.max(...clients.map(c => c.monthly));
+    const kpis = kpiRow([
+      { label: 'Revenue this month', value: lakh(monthly), count: false, icon: 'rupee', trend: { text: '▲ 6.1%' } },
+      { label: 'Revenue today',      value: rupees(184620), icon: 'pulse', color: '#2563eb' },
+      { label: 'Outstanding',        value: lakh(outstanding), count: false, icon: 'invoice', color: '#d97706', note: '1 invoice overdue' },
+      { label: 'Refunds this month', value: rupees(12450), icon: 'undo', color: '#8b5cf6', note: '9 cancelled tests' }
+    ]);
+    const depts = deptRevenue.map(d => `
+      <div class="rev row-anim">
+        <div class="rev-top"><span class="rev-name">${d.dept}</span><span class="rev-val">${lakh(d.value)}</span></div>
+        <div class="rev-track"><div class="rev-fill" data-w="${(d.value / maxDept * 100).toFixed(1)}" style="width:${(d.value / maxDept * 100).toFixed(1)}%;--c:${deptColor[d.dept]}"></div></div>
+      </div>`).join('');
+    const rows = clients.map(c => `
+      <tr class="row-anim" onclick="go404()">
+        <td class="stack" data-label="Client"><span class="t-name">${c.name}</span><span class="t-sub">${c.model}</span></td>
+        <td data-label="Monthly value"><div class="mini"><span class="mini-track"><span class="mini-fill" data-w="${Math.round(c.monthly / maxClient * 100)}" style="width:${Math.round(c.monthly / maxClient * 100)}%"></span></span><span class="mini-num">${rupees(c.monthly)}</span></div></td>
+        <td data-label="Next invoice">${c.next}</td>
+        <td data-label="Payment">${pill(c.state)}</td>
+      </tr>`).join('');
+    return `${kpis}
+      ${card({ kicker: 'Revenue', title: 'Revenue by department', sub: 'This month', icon: 'rupee' }, `<div class="rev-list">${depts}</div>`)}
+      ${card({ kicker: 'Income', title: 'Client ledger', sub: 'Hospitals, insurers, corporate and walk-in', icon: 'invoice', cls: 'card-table' },
+        `<div class="table-wrap"><table class="table">
+          <thead><tr><th>Client</th><th>Monthly value</th><th>Next invoice</th><th>Payment</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>`)}`;
+  }
+
+  /* =========================================================
+     SECURITY
+     ========================================================= */
+  function switchHtml(id, value) {
+    return `<span class="switch ${value ? 'on' : ''}" data-toggle="${id}" role="switch" aria-checked="${value}" tabindex="0"><span class="switch-knob"></span></span>`;
+  }
+  function selectHtml(id, options, value) {
+    return `<select class="pref-select" id="${id}">${options.map(o => `<option ${value === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+  }
+  function renderSecurity() {
+    const s = state.settings;
+    return `<div class="grid grid-settings">
+      ${card({ kicker: 'Policy', title: 'Access policy', sub: 'Applied to everyone who handles patient data', icon: 'lock' },
+        `<div class="pref"><div><span class="pref-title">Two-factor sign-in for staff</span><span class="pref-desc">Required for admins and anyone who can sign off reports</span></div>${switchHtml('twoFactor', s.twoFactor)}</div>
+        <div class="pref"><div><span class="pref-title">Only pathologists release reports</span><span class="pref-desc">Technicians can prepare results but not send them</span></div>${switchHtml('releaseByPathologist', s.releaseByPathologist)}</div>
+        <div class="pref"><div><span class="pref-title">Mask patient names at the front desk</span><span class="pref-desc">Shows initials and sample IDs only</span></div>${switchHtml('maskNames', s.maskNames)}</div>
+        <div class="pref pref-last"><div><span class="pref-title">IP allowlist</span><span class="pref-desc">Only allow sign-ins from centre networks</span></div>${switchHtml('ipAllowlist', s.ipAllowlist)}</div>`)}
+      <div class="stack-col">
+        ${card({ kicker: 'Sessions', title: 'Session policy', sub: 'How long an idle session stays signed in', icon: 'clock' },
+          `<div class="pref pref-last"><div><span class="pref-title">Automatic sign-out</span><span class="pref-desc">Applies to every staff account</span></div>${selectHtml('timeout-select', ['15 minutes', '30 minutes', '1 hour', '4 hours'], s.sessionTimeout)}</div>`)}
+        ${card({ kicker: 'Danger', title: 'Lab-wide actions', sub: 'These take effect immediately for everyone', icon: 'alert' },
+          `<div class="danger-row"><button class="chip chip-danger" onclick="go404()">Sign out every session</button><button class="chip chip-danger" onclick="go404()">Lock report release</button></div>`)}
+      </div>
+    </div>`;
+  }
+
+  /* =========================================================
+     SETTINGS
+     ========================================================= */
+  function renderSettings() {
+    const s = state.settings;
+    const displayName = currentUsername || 'Signed out';
+    const displayEmail = currentEmail || 'No account signed in';
+    return `<div class="grid grid-settings">
+      ${card({ kicker: 'Profile', title: 'Account', sub: 'The profile signed in on this device', icon: 'users' },
+        `<div class="account">
+          <span class="avatar avatar--admin lg">${currentInitial}</span>
+          <div>
+            <span class="account-name">${esc(displayName)}</span>
+            <span class="account-email">${esc(displayEmail)}</span>
+            <span class="account-role">${currentRole}</span>
+          </div>
+        </div>
+        <button class="chip" onclick="go404()">Edit profile</button>`)}
+
+      ${card({ kicker: 'Preferences', title: 'Preferences', sub: 'Alerts and how the console reads', icon: 'gear' },
+        `<div class="pref"><div><span class="pref-title">SMS me critical values</span><span class="pref-desc">The moment an analyser flags one</span></div>${switchHtml('criticalSms', s.criticalSms)}</div>
+        <div class="pref"><div><span class="pref-title">QC failure alerts</span><span class="pref-desc">When a control run breaks a Westgard rule</span></div>${switchHtml('qcAlerts', s.qcAlerts)}</div>
+        <div class="pref"><div><span class="pref-title">Daily operations digest</span><span class="pref-desc">Samples, TAT and revenue every evening at 9 PM</span></div>${switchHtml('dailyDigest', s.dailyDigest)}</div>
+        <div class="pref"><div><span class="pref-title">Compact rows</span><span class="pref-desc">Tighter spacing in the queue and staff tables</span></div>${switchHtml('compactRows', s.compactRows)}</div>
+        <div class="pref pref-last"><div><span class="pref-title">Language</span><span class="pref-desc">Interface display language</span></div>${selectHtml('lang-select', ['English', 'Tamil', 'Telugu', 'Hindi'], s.language)}</div>`)}
+
+      ${card({ kicker: 'Session', title: 'Session', sub: 'Sign out of this account on this device', icon: 'lock' },
+        `<div class="session"><p>Signed in as <strong>${esc(displayEmail)}</strong>. Signing out clears the session and returns you to the sign-in screen.</p>
+        <button class="chip chip-danger" id="settings-logout-btn">Sign out</button></div>`)}
+
+      ${card({ kicker: 'Danger', title: 'Account actions', sub: 'These cannot be undone', icon: 'alert' },
+        `<div class="danger-row"><button class="chip chip-danger" onclick="go404()">Reset password</button><button class="chip chip-danger" onclick="go404()">Close account</button></div>`)}
+    </div>`;
+  }
+
+  const pageRenderers = {
+    dashboard: renderDashboard, queue: renderQueue, signoff: renderSignoff, analysers: renderAnalysers,
+    qc: renderQc, audit: renderAudit, centres: renderCentres, staff: renderStaff, billing: renderBilling,
+    security: renderSecurity, settings: renderSettings
+  };
+
+  /* =========================================================
+     MOTION (GSAP) — the page is complete without it
+     ========================================================= */
+  function countUp(el) {
+    const raw = el.textContent.trim();
+    const m = raw.match(/^([^\d]*)([\d,]+\.?\d*)(.*)$/);
+    if (!m) return;
+    const prefix = m[1], numStr = m[2].replace(/,/g, ''), suffix = m[3];
+    const target = parseFloat(numStr);
+    const decimals = numStr.includes('.') ? numStr.split('.')[1].length : 0;
+    const o = { v: 0 };
+    gsap.to(o, { v: target, duration: 1.1, ease: 'power2.out',
+      onUpdate: () => { el.textContent = prefix + (decimals ? o.v.toFixed(decimals) : fmt(Math.round(o.v))) + suffix; },
+      onComplete: () => { el.textContent = raw; } });
+  }
+  function animateRows() {
+    if (!ANIM) return;
+    gsap.from('#content-area .row-anim', { y: 12, opacity: 0, duration: .4, stagger: .03, ease: 'power2.out', clearProps: 'transform,opacity' });
+  }
+  function animatePage() {
+    if (!ANIM) return;
+    const A = '#content-area';
+    gsap.from('#page-head > *', { y: 14, opacity: 0, duration: .5, stagger: .07, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from(`${A} .anim`, { y: 26, opacity: 0, duration: .65, stagger: .07, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from(`${A} .row-anim`, { x: -12, opacity: 0, duration: .45, stagger: .03, delay: .25, ease: 'power2.out', clearProps: 'transform,opacity' });
+    gsap.from(`${A} [data-w]`, { width: 0, duration: 1.1, delay: .3, stagger: .05, ease: 'power3.out' });
+    gsap.from(`${A} [data-h]`, { height: 0, duration: .9, delay: .25, stagger: .04, ease: 'back.out(1.4)' });
+    document.querySelectorAll(`${A} .ring-fg`).forEach((c, i) => {
+      gsap.fromTo(c, { strokeDashoffset: c.dataset.full }, { strokeDashoffset: c.dataset.dash, duration: 1.3, delay: .3 + i * .06, ease: 'power3.out' });
+    });
+    document.querySelectorAll(`${A} .lj-path`).forEach(p => {
+      const plot = p.closest('.lj-plot');
+      // the line is stretched to the plot, so scale the dash to cover its on-screen length
+      const k = plot ? Math.max(plot.clientWidth / 600, plot.clientHeight / 220, 1) * 1.1 : 1.5;
+      const len = (p.getTotalLength ? p.getTotalLength() : 1500) * k;
+      gsap.fromTo(p, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 1.6, delay: .3, ease: 'power2.out', clearProps: 'strokeDasharray,strokeDashoffset' });
+    });
+    gsap.from(`${A} .lj-dot`, { scale: 0, duration: .35, stagger: .04, delay: .5, ease: 'back.out(3)', clearProps: 'transform' });
+    gsap.from(`${A} .tat-target`, { scaleY: 0, duration: .5, delay: 1, stagger: .08, ease: 'back.out(3)', clearProps: 'transform' });
+    document.querySelectorAll(`${A} [data-count]`).forEach(countUp);
+  }
+
+  /* background: bands slowly migrate down their gel lanes */
+  (function gel() {
+    const box = document.getElementById('bgBands');
+    const colors = ['rgba(13,148,136,.22)', 'rgba(37,99,235,.18)', 'rgba(139,92,246,.18)', 'rgba(13,148,136,.14)'];
+    const lanes = Math.ceil(window.innerWidth / 64) + 1;
+    let html = '';
+    for (let l = 0; l < lanes; l++) {
+      const n = 2 + (l % 3);
+      for (let b = 0; b < n; b++) {
+        html += `<i style="left:${l * 64 + 12}px;top:${(b * 31 + l * 17) % 100}%;width:40px;height:${4 + (b + l) % 5}px;background:${colors[(l + b) % colors.length]}"></i>`;
+      }
+    }
+    box.innerHTML = html;
+    if (!ANIM) return;
+    box.querySelectorAll('i').forEach(band => {
+      gsap.to(band, { yPercent: 0, y: '+=' + (60 + Math.random() * 120), opacity: .35, duration: 8 + Math.random() * 10, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: Math.random() * 4 });
+    });
+  })();
+
+  /* =========================================================
+     SHELL
+     ========================================================= */
+  function badgeFor(id) {
+    if (id === 'signoff' && signoffs.length) return `<span class="nav-badge nav-badge--info">${signoffs.length}</span>`;
+    if (id === 'queue') { const n = queue.filter(q => q.status === 'Delayed').length; return n ? `<span class="nav-badge nav-badge--warn">${n}</span>` : ''; }
+    if (id === 'qc') { const n = Object.values(qcSets).filter(q => q.runs.some(v => Math.abs((v - q.mean) / q.sd) > 3)).length; return n ? `<span class="nav-badge">${n}</span>` : ''; }
+    if (id === 'billing') { const n = clients.filter(c => c.state === 'Overdue').length; return n ? `<span class="nav-badge">${n}</span>` : ''; }
+    return '';
+  }
+  function renderNav() {
+    document.getElementById('nav-drawer').innerHTML = navGroups.map(g => `
+      <p class="dock-label">${g.label}</p>
+      <nav class="dock-nav">${g.items.map(i => `<button class="dock-item ${state.activeNav === i.id ? 'on' : ''}" data-nav="${i.id}" ${state.activeNav === i.id ? 'aria-current="page"' : ''}>${ico(i.icon, 'dock-ico')}<span class="dock-text">${i.label}</span>${badgeFor(i.id)}</button>`).join('')}</nav>`).join('');
+    document.querySelector('#notif-btn .icon-dot').style.display = signoffs.length ? '' : 'none';
+  }
+
+  function renderPage(animate) {
+    const page = pageMap[state.activeNav];
+    const group = navGroups.find(g => g.items.some(i => i.id === state.activeNav));
+    document.getElementById('page-title-text').textContent = page.title;
+    document.getElementById('page-sub-text').textContent = page.sub;
+    document.getElementById('page-kicker').textContent = 'Admin console · ' + (group ? group.label : '');
+    document.getElementById('page-actions').innerHTML = pageActions[state.activeNav] || '';
+    document.title = page.title + ' – Admin Console';
+    const content = document.getElementById('content-area');
+    content.innerHTML = pageRenderers[state.activeNav]();
+    document.body.classList.toggle('compact', !!state.settings.compactRows);
+    renderNav();
+    const sBtn = document.getElementById('settings-logout-btn');
+    if (sBtn) sBtn.addEventListener('click', logout);
+    if (animate !== false) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      animatePage();
+    }
+  }
+
+  function navigateTo(id) {
+    if (!pageMap[id]) return;
+    state.activeNav = id;
+    writeStore('adminNav', id);
+    closeDrawer();
+    closeWhoami();
+    renderPage();
+  }
+
+  /* ---- report sign-off: release / send back ---- */
+  function resolveSignoff(id, released) {
+    const req = signoffs.find(r => r.id === id);
+    if (!req) return;
+    const row = document.querySelector('[data-req="' + id + '"]');
+    function finish() {
+      signoffs = signoffs.filter(r => r.id !== id);
+      auditTrail.unshift({
+        time: 'Just now', actor: 'Admin (You)',
+        action: released ? 'Released report' : 'Sent report back for rerun',
+        target: req.id + ' · ' + req.test, scope: req.patient
+      });
+      const box = document.getElementById('approvals-box');
+      if (box) box.innerHTML = signoffHtml();
+      document.querySelectorAll('#approval-count').forEach(c => c.textContent = signoffs.length);
+      const trail = document.getElementById('overview-trail');
+      if (trail) trail.innerHTML = trailHtml(auditTrail.slice(0, 5));
+      renderNav();
+      toast((released ? 'Released ' : 'Sent back for rerun: ') + req.id + ' · ' + req.test, released ? 'yes' : 'no');
+    }
+    if (row && ANIM) {
+      row.classList.add(released ? 'is-yes' : 'is-no');
+      gsap.to(row, { x: released ? 40 : -40, opacity: 0, height: 0, paddingTop: 0, paddingBottom: 0, marginTop: 0, duration: .45, ease: 'power2.in', onComplete: finish });
+    } else {
+      finish();
+    }
+  }
+
+  /* ---- sidebar: fixed on desktop, drawer at 1100px and below ---- */
+  const MENU_BREAK = 1100;
+  const sidebar = document.getElementById('sidebar');
+  const scrim = document.getElementById('scrim');
+  const burger = document.getElementById('hamburger-btn');
+
+  function openDrawer() {
+    sidebar.classList.add('open');
+    scrim.classList.add('show');
+    burger.classList.add('is-open');
+    burger.setAttribute('aria-expanded', 'true');
+    burger.setAttribute('aria-label', 'Close menu');
+    sidebar.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('nav-open');
+    if (ANIM) gsap.from('#nav-drawer .dock-item', { x: -16, opacity: 0, duration: .35, stagger: .025, delay: .1, clearProps: 'transform,opacity' });
+  }
+  function closeDrawer() {
+    if (!sidebar.classList.contains('open')) return;
+    sidebar.classList.remove('open');
+    scrim.classList.remove('show');
+    burger.classList.remove('is-open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'Open menu');
+    document.body.classList.remove('nav-open');
+    syncDock();
+  }
+  function syncDock() {
+    const fixed = window.innerWidth > MENU_BREAK;
+    if (fixed) closeDrawer();
+    sidebar.setAttribute('aria-hidden', fixed || sidebar.classList.contains('open') ? 'false' : 'true');
+  }
+  burger.addEventListener('click', () => sidebar.classList.contains('open') ? closeDrawer() : openDrawer());
+  document.getElementById('dock-close').addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  window.addEventListener('resize', syncDock);
+  syncDock();
+
+  /* ---- user menu ---- */
+  const whoami = document.getElementById('topbar-user');
+  const whoamiBtn = document.getElementById('topbar-user-btn');
+  function closeWhoami() { whoami.classList.remove('open'); whoamiBtn.setAttribute('aria-expanded', 'false'); }
+  whoamiBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = whoami.classList.toggle('open');
+    whoamiBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', e => { if (!whoami.contains(e.target)) closeWhoami(); });
+
+  document.getElementById('notif-btn').addEventListener('click', () => navigateTo('signoff'));
+  document.getElementById('logout-btn').addEventListener('click', logout);
+  document.getElementById('topbar-logout-btn').addEventListener('click', logout);
+
+  /* ---- top bar search: searches staff; on phones the magnifier opens the field first ---- */
+  const finder = document.getElementById('topbar-search');
+  const finderInput = document.getElementById('topbar-search-input');
+  function openFinder() { finder.classList.add('expanded'); finderInput.focus(); }
+  finder.addEventListener('submit', e => {
+    e.preventDefault();
+    if (window.innerWidth <= 720 && !finder.classList.contains('expanded')) { openFinder(); return; }
+    const q = finderInput.value.trim();
+    if (!q) { finderInput.focus(); return; }
+    state.staffSearch = q;
+    finderInput.value = ''; finder.classList.remove('expanded'); finderInput.blur();
+    navigateTo('staff');
+  });
+  finderInput.addEventListener('blur', () => { if (!finderInput.value.trim()) finder.classList.remove('expanded'); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeDrawer(); closeWhoami(); finderInput.blur(); }
+    const typing = e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
+    if (e.key === '/' && !typing) { e.preventDefault(); openFinder(); }
+  });
+
+  /* ---- chart tooltip ---- */
+  const tip = document.getElementById('chart-tip');
+  function showTip(el) {
+    tip.textContent = el.getAttribute('data-tip');
+    tip.classList.add('show');
+    const r = el.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    let x = r.left + r.width / 2 - w / 2;
+    x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+    tip.style.left = x + 'px';
+    tip.style.top = Math.max(8, r.top - tip.offsetHeight - 10) + 'px';
+  }
+  function hideTip() { tip.classList.remove('show'); }
+  document.addEventListener('mouseover', e => { const t = e.target.closest('[data-tip]'); if (t) showTip(t); });
+  document.addEventListener('mouseout', e => { if (e.target.closest('[data-tip]')) hideTip(); });
+  document.addEventListener('focusin', e => { const t = e.target.closest && e.target.closest('[data-tip]'); if (t) showTip(t); });
+  document.addEventListener('focusout', hideTip);
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  /* ---- delegated clicks ---- */
+  document.addEventListener('click', e => {
+    const yes = e.target.closest('[data-approve]');
+    if (yes) { resolveSignoff(yes.dataset.approve, true); return; }
+    const no = e.target.closest('[data-decline]');
+    if (no) { resolveSignoff(no.dataset.decline, false); return; }
+    const navBtn = e.target.closest('[data-nav]');
+    if (navBtn) { navigateTo(navBtn.getAttribute('data-nav')); return; }
+    const qf = e.target.closest('.queue-filter');
+    if (qf) { state.queueDept = qf.dataset.filter; renderPage(false); animateRows(); return; }
+    const cf = e.target.closest('.qc-filter');
+    if (cf) { state.qcSet = cf.dataset.filter; renderPage(false); animatePage(); return; }
+    const toggle = e.target.closest('[data-toggle]');
+    if (toggle) { flipSwitch(toggle); return; }
+  });
+  document.addEventListener('keydown', e => {
+    const toggle = e.target.closest && e.target.closest('[data-toggle]');
+    if (toggle && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); flipSwitch(toggle); }
+  });
+  function flipSwitch(toggle) {
+    const key = toggle.dataset.toggle;
+    state.settings[key] = !state.settings[key];
+    saveSettings();
+    toggle.classList.toggle('on', state.settings[key]);
+    toggle.setAttribute('aria-checked', String(state.settings[key]));
+    if (key === 'compactRows') document.body.classList.toggle('compact', state.settings[key]);
+    toast((state.settings[key] ? 'Turned on: ' : 'Turned off: ') + toggle.closest('.pref').querySelector('.pref-title').textContent, state.settings[key] ? 'yes' : 'no');
+  }
+  document.addEventListener('input', e => {
+    if (e.target && e.target.id === 'staff-search-input') { state.staffSearch = e.target.value; updateStaffRows(); }
+  });
+  document.addEventListener('change', e => {
+    if (!e.target) return;
+    if (e.target.id === 'lang-select')    { state.settings.language = e.target.value; saveSettings(); }
+    if (e.target.id === 'timeout-select') { state.settings.sessionTimeout = e.target.value; saveSettings(); toast('Automatic sign-out set to ' + e.target.value, 'yes'); }
+  });
+
+  /* ---- boot ---- */
+  paintUserChrome();
+  renderPage();
+  if (ANIM) {
+    // the drawer's off-screen position is a CSS transform, so only animate the fixed desktop sidebar
+    if (window.innerWidth > MENU_BREAK) gsap.from('.dock', { x: -30, opacity: 0, duration: .7, ease: 'power3.out', clearProps: 'transform,opacity' });
+    gsap.from('.head', { y: -20, opacity: 0, duration: .6, ease: 'power3.out', clearProps: 'transform,opacity' });
+  }
+  </script>
+</body>
+</html>

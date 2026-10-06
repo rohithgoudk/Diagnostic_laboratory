@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact us — STACKLY Diagnostics</title>
+<meta name="description" content="Call, WhatsApp, email or visit STACKLY Diagnostics in Salem. Care team open 6:30 AM – 9 PM daily; pathologist on call 24 × 7.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/contact.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body class="is-loading">
+
+<!-- ============ PRELOADER — a sample tube fills while the page loads ============ -->
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="pl-inner">
+    <div class="pl-tube"><span class="pl-cap"></span><span class="pl-liquid" id="plLiquid"></span></div>
+    <div class="pl-word"><span>S</span><span>T</span><span>A</span><span>C</span><span>K</span><span>L</span><span>Y</span></div>
+    <div class="pl-text">Connecting you to our team <b id="plPct">0%</b></div>
+  </div>
+</div>
+
+<!-- ============ HEADER — transparent over the hero, turns solid on scroll ============ -->
+<header class="site-header" id="siteHeader">
+  <nav class="nav wrap">
+    <!-- Logo — replace src with your logo, e.g. ../assets/Logo.webp -->
+    <a href="index.html" class="logo" aria-label="Home">
+      <span class="logo-shine" aria-hidden="true"></span>
+      <img src="../assets/Logo.webp" alt="Company logo">
+    </a>
+
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="about.html">About</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html" class="active" aria-current="page">Contact</a>
+      <span class="nav-line" id="navLine" aria-hidden="true"></span>
+    </div>
+
+    <div class="nav-right">
+      <a href="login.html" class="nav-login">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+        Login
+      </a>
+      <a href="signup.html" class="btn btn-primary btn-sm nav-signup">
+        <svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c1.2-3.4 4.2-5 6.5-5s5.3 1.6 6.5 5"/><path d="M19 8v6M22 11h-6"/></svg>
+        Sign Up
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="scroll-bar" id="scrollBar" aria-hidden="true"></div>
+</header>
+
+<!-- ============ MOBILE MENU — slides in from the right ============ -->
+<div class="menu-scrim" id="menuScrim"></div>
+<aside class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Menu">
+  <div class="mm-top">
+    <a href="index.html" class="logo logo--plate" aria-label="Home">
+      <img src="../assets/Logo.webp" alt="Company logo">
+    </a>
+    <button class="mm-close" id="mobileMenuClose" aria-label="Close menu">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav class="mm-links">
+    <a href="index.html"><em>01</em>Home</a>
+    <a href="services.html"><em>02</em>Services</a>
+    <a href="about.html"><em>03</em>About</a>
+    <a href="blog.html"><em>04</em>Blog</a>
+    <a href="contact.html" class="active" aria-current="page"><em>05</em>Contact</a>
+  </nav>
+  <div class="mm-actions">
+    <a href="login.html" class="btn btn-ghost">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+      Login
+    </a>
+    <a href="signup.html" class="btn btn-primary">
+      <svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c1.2-3.4 4.2-5 6.5-5s5.3 1.6 6.5 5"/><path d="M19 8v6M22 11h-6"/></svg>
+      Sign Up
+    </a>
+  </div>
+  <p class="mm-note"><span class="live-dot"></span>Lab open today · 6:30 AM – 9 PM</p>
+</aside>
+
+<main>
+
+<!-- ============ 1. HERO — simple, contact-first ============ -->
+<section class="c-hero" id="hero">
+  <div class="ch-bg" aria-hidden="true"><div class="ch-dots"></div><div class="ch-glow cg1"></div><div class="ch-glow cg2"></div></div>
+  <div class="wrap ch-grid">
+    <div class="ch-copy">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><span aria-current="page">Contact</span></nav>
+      <span class="ch-status" id="openStatus"><span class="live-dot"></span><span id="openText">Checking lab hours…</span></span>
+      <h1>Talk to a real person — <span class="grad-light">we usually answer in under a minute.</span></h1>
+      <p class="ch-sub">Questions about a test, a report or a home visit? Call, message or write to our care team in Salem. Pathologists are on call for urgent results, day and night.</p>
+      <div class="ch-actions">
+        <a href="tel:07123712345" class="btn btn-primary btn-lg">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call 0712 371 2345
+        </a>
+        <a href="404.html" class="btn btn-glass btn-lg">Send a message</a>
+      </div>
+    </div>
+
+    <aside class="ch-card" aria-label="Quick contact details">
+      <h2>Quick contact</h2>
+      <ul class="ch-list">
+        <li><span class="ci"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span><small>Care team</small><a href="tel:07123712345">0712 371 2345</a></span></li>
+        <li><span class="ci"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span><span><small>Email</small><a href="mailto:hello@stackly.com">hello@stackly.com</a></span></li>
+        <li><span class="ci"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></span><span><small>Main lab</small><a href="#map">MMR Complex, Chinna Thirupathi, Salem 636008</a></span></li>
+        <li><span class="ci"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg></span><span><small>Hours</small><b>Every day · 6:30 AM – 9 PM</b></span></li>
+      </ul>
+      <p class="ch-note"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg>Your messages are private and never shared.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ 2. WAYS TO REACH US ============ -->
+<section class="section ways" id="ways">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Ways to reach us</span>
+      <h2>Pick whatever is <span class="grad">easiest for you</span></h2>
+    </div>
+    <div class="way-grid">
+      <a href="404.html" class="way" style="--c:#14b8a6">
+        <span class="way-ico"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <h3>Call us</h3>
+        <p>Bookings, prices and preparation questions.</p>
+        <b>0712 371 2345</b>
+        <span class="way-meta">Avg. wait: under 1 minute</span>
+      </a>
+      <a href="404.html" class="way" style="--c:#10b981">
+        <span class="way-ico"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12z"/><path d="M9 9.5c.5 2 2 3.5 4 4l1-1 2 1c-.3 1-1.2 1.5-2.2 1.3C11 14.3 9.7 13 9.2 10.2 9 9.2 9.6 8.3 10.5 8l1 2z"/></svg></span>
+        <h3>WhatsApp</h3>
+        <p>Send a prescription photo and get a quote.</p>
+        <b>Chat with us</b>
+        <span class="way-meta">Replies within 10 minutes</span>
+      </a>
+      <a href="404.html" class="way" style="--c:#2563eb">
+        <span class="way-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+        <h3>Email</h3>
+        <p>Report copies, invoices and corporate enquiries.</p>
+        <b>hello@stackly.com</b>
+        <span class="way-meta">Replies within 4 working hours</span>
+      </a>
+      <a href="404.html" class="way" style="--c:#8b5cf6">
+        <span class="way-ico"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></span>
+        <h3>Visit the lab</h3>
+        <p>Walk in for sample collection — no appointment needed.</p>
+        <b>See on the map</b>
+        <span class="way-meta">Free parking for patients</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. MESSAGE FORM + DIRECT LINES ============ -->
+<section class="section message" id="message">
+  <div class="wrap msg-grid">
+    <form class="c-form" id="cForm" novalidate data-reveal>
+      <div class="cf-head">
+        <span class="kicker">Send us a message</span>
+        <h2>How can we help?</h2>
+      </div>
+      <div class="cf-row">
+        <label class="cf-field"><span>Full name <i>*</i></span><input id="cfName" autocomplete="name" placeholder="Your name"><em class="cf-err"></em></label>
+        <label class="cf-field"><span>Mobile number <i>*</i></span><input id="cfPhone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile"><em class="cf-err"></em></label>
+      </div>
+      <div class="cf-row">
+        <label class="cf-field"><span>Email</span><input id="cfEmail" type="email" autocomplete="email" placeholder="you@example.com (optional)"><em class="cf-err"></em></label>
+        <label class="cf-field"><span>Topic <i>*</i></span>
+          <select id="cfTopic">
+            <option value="">Choose a topic</option>
+            <option>Book a test</option>
+            <option>Question about my report</option>
+            <option>Home sample collection</option>
+            <option>Billing or refund</option>
+            <option>Corporate or hospital partnership</option>
+            <option>Feedback or complaint</option>
+          </select><em class="cf-err"></em>
+        </label>
+      </div>
+      <label class="cf-field"><span>Message <i>*</i></span>
+        <textarea id="cfMsg" rows="5" maxlength="500" placeholder="Tell us what you need. If it's about a report, include the sample ID (e.g. LB-24817)."></textarea>
+        <span class="cf-count"><span id="cfCount">0</span> / 500</span><em class="cf-err"></em>
+      </label>
+      <fieldset class="cf-pref">
+        <legend>How should we reply?</legend>
+        <label><input type="radio" name="reply" value="Phone call" checked><span>Phone call</span></label>
+        <label><input type="radio" name="reply" value="WhatsApp"><span>WhatsApp</span></label>
+        <label><input type="radio" name="reply" value="Email"><span>Email</span></label>
+      </fieldset>
+      <label class="cf-consent"><input type="checkbox" id="cfConsent"><span>I agree that STACKLY may contact me about this request.</span></label>
+      <em class="cf-err cf-consent-err" id="cfConsentErr"></em>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">Send message <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+
+      <div class="cf-done" id="cfDone" hidden>
+        <span class="cf-check"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span>
+        <h3>Message received</h3>
+        <p id="cfDoneText">We'll get back to you shortly.</p>
+        <span class="cf-ticket" id="cfTicket"></span>
+        <button type="button" class="btn btn-ghost" id="cfAgain">Send another message</button>
+      </div>
+    </form>
+
+    <aside class="lines" data-reveal>
+      <h3>Direct lines</h3>
+      <p>Skip the menu — reach the right desk straight away.</p>
+      <ul>
+        <li><span class="ln-ico" style="--c:#14b8a6"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5"/></svg></span><span class="ln-t"><b>Reports desk</b><small>Copies, corrections, doctor queries</small></span><a href="tel:07123712346">0712 371 2346</a></li>
+        <li><span class="ln-ico" style="--c:#2563eb"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg></span><span class="ln-t"><b>Home collection</b><small>Book, reschedule or track a visit</small></span><a href="tel:07123712347">0712 371 2347</a></li>
+        <li><span class="ln-ico" style="--c:#d97706"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3"/></svg></span><span class="ln-t"><b>Billing</b><small>Invoices, refunds, insurance</small></span><a href="tel:07123712348">0712 371 2348</a></li>
+        <li><span class="ln-ico" style="--c:#8b5cf6"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1M14 9h1M9 13h1M14 13h1M9 17h1M14 17h1"/></svg></span><span class="ln-t"><b>Corporate &amp; hospitals</b><small>Camps, referrals, partnerships</small></span><a href="mailto:partners@stackly.com">partners@stackly.com</a></li>
+      </ul>
+      <div class="lines-promise"><b>Our promise</b><span>Every message gets a reply from a real person — usually the same day.</span></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ 4. MAP ============ -->
+<section class="section mapsec" id="map">
+  <div class="wrap">
+    <div class="sec-head sec-head--row" data-reveal>
+      <div>
+        <span class="kicker">Find us</span>
+        <h2>Visit our main lab <span class="grad">in Salem</span></h2>
+      </div>
+      <a href="404.html" class="btn btn-primary" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>
+        Get directions
+      </a>
+    </div>
+    <div class="map-wrap" data-reveal>
+      <div class="map-frame">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3907.1616097152896!2d78.1739798!3d11.682956599999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3babefef7fd970bb%3A0xe11aef1a71994f9!2sStackly!5e0!3m2!1sen!2sin!4v1791271363762!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="Map showing the STACKLY main lab in Salem"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. HOURS — live open / closed ============ -->
+<section class="section hours" id="hours">
+  <div class="wrap hours-grid">
+    <div class="hours-copy" data-reveal>
+      <span class="kicker kicker--light">Opening hours</span>
+      <h2>When each desk <span class="grad-light">is open</span></h2>
+      <p>All times are Indian Standard Time. Status updates live, so you'll always know if we can pick up right now.</p>
+      <div class="clock"><span class="clock-ico"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg></span><span><small>Time in Salem now</small><b id="istNow">—</b></span></div>
+    </div>
+    <ul class="hrs" data-reveal>
+      <li data-open="06:30" data-close="21:00"><span class="h-t"><b>Lab &amp; walk-in collection</b><small>Main lab and all 18 centres</small></span><span class="h-time">6:30 AM – 9 PM · daily</span><span class="h-state"></span></li>
+      <li data-open="06:30" data-close="12:00"><span class="h-t"><b>Home sample collection</b><small>Last booking for the day by 11 AM</small></span><span class="h-time">6:30 AM – 12 PM · daily</span><span class="h-state"></span></li>
+      <li data-open="06:30" data-close="21:00"><span class="h-t"><b>Care team phone line</b><small>Bookings, prices, preparation</small></span><span class="h-time">6:30 AM – 9 PM · daily</span><span class="h-state"></span></li>
+      <li data-open="09:00" data-close="18:00" data-days="1,2,3,4,5,6"><span class="h-t"><b>Billing desk</b><small>Invoices, refunds, insurance</small></span><span class="h-time">9 AM – 6 PM · Mon–Sat</span><span class="h-state"></span></li>
+      <li data-open="00:00" data-close="24:00"><span class="h-t"><b>Pathologist on call</b><small>Critical results and doctors only</small></span><span class="h-time">24 × 7</span><span class="h-state"></span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 6. FAQ ============ -->
+<section class="section faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="faq-copy" data-reveal>
+      <span class="kicker">Before you write</span>
+      <h2>Quick answers to <span class="grad">common questions</span></h2>
+      <p>Most questions are answered here in seconds. If not, we're one call away.</p>
+      <a href="404.html" class="btn btn-ghost">Call the care team</a>
+    </div>
+    <div class="acc" data-reveal>
+      <div class="acc-item is-open">
+        <button class="acc-q" aria-expanded="true">How quickly will you reply to my message?<i></i></button>
+        <div class="acc-a"><div><p>Messages sent between 6:30 AM and 9 PM are answered within an hour, usually much sooner. Messages sent overnight are answered first thing the next morning.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">I lost my report. Can I get another copy?<i></i></button>
+        <div class="acc-a"><div><p>Yes, free of charge. Sign in to your account to download it, or call the reports desk with your sample ID and registered mobile number and we'll send it by SMS and email.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">Can I change or cancel a home collection?<i></i></button>
+        <div class="acc-a"><div><p>You can reschedule or cancel for free up to one hour before the slot. Call the home collection line or reply to your booking SMS.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">How do I raise a complaint?<i></i></button>
+        <div class="acc-a"><div><p>Choose "Feedback or complaint" in the form above. Every complaint is read by our quality manager, and you'll get a reference number and a call back within one working day.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">Do you have parking at the main lab?<i></i></button>
+        <div class="acc-a"><div><p>Yes — free parking for patients right in front of MMR Complex, with a ramp and a ground-floor collection room.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. URGENT LINE ============ -->
+<section class="section urgent" id="urgent">
+  <div class="wrap">
+    <div class="ug" data-reveal>
+      <span class="ug-pulse" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>
+      <div class="ug-copy">
+        <span class="kicker kicker--light">For doctors &amp; critical results</span>
+        <h2>Need a pathologist right now?</h2>
+        <p>Our pathologist on-call line is open 24 × 7 for critical values and doctor-to-doctor discussions. For a medical emergency, please call <b>108</b>.</p>
+      </div>
+      <div class="ug-actions">
+        <a href="404.html" class="btn btn-light btn-lg">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          0712 371 2399
+        </a>
+        <a href="tel:108" class="btn btn-glass btn-lg">Emergency · 108</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-glow" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="footer-cta" data-reveal>
+      <div>
+        <h3>Book your test today — reports by this evening.</h3>
+        <p>Free home collection across Salem from 6:30 AM.</p>
+      </div>
+      <a href="404.html" class="btn btn-primary">Talk to our team
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo" aria-label="Home">
+          <img src="../assets/Logo.webp" alt="Company logo">
+        </a>
+        <p>Accurate diagnostics, free home collection and reports you can understand — for every family in Salem.</p>
+        <div class="footer-social">
+          <a href="404.html" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="404.html" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 21v-7h2.5l.5-3H14V9.2c0-.9.3-1.7 1.7-1.7H17V5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.2V11H8v3h2.6v7"/></svg></a>
+          <a href="404.html" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="10"/><circle cx="5" cy="5" r="1.6"/><path d="M11 19v-6.5a2.5 2.5 0 0 1 5 0V19M11 12.5V19"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="404.html">Blood tests</a>
+        <a href="404.html">Health packages</a>
+        <a href="404.html">Home sample collection</a>
+        <a href="404.html">Histopathology</a>
+        <a href="404.html">Corporate wellness</a>
+      </div>
+      <div class="footer-col">
+        <h4>Get In Touch</h4>
+        <ul class="footer-contact">
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+            <a href="404.html">MMR Complex, Periyakollappatty,<br>Chinna Thirupathi, Salem, Tamil<br>Nadu 636008</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <a href="404.html">0712 371 2345</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <a href="404.html">hello@stackly.com</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 STACKLY SOLUTIONS</span>
+      <span class="status-dot"><span class="live-dot"></span>Lab open · reports going out now</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Back to top — the ring fills as you scroll -->
+<button class="to-top" id="toTop" aria-label="Back to top">
+  <svg class="tt-ring" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><circle class="tt-fill" id="ttFill" cx="24" cy="24" r="21"/></svg>
+  <svg class="tt-arrow" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+(function () {
+  'use strict';
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HAS_GSAP = !!(window.gsap && window.ScrollTrigger);
+  var ANIM = HAS_GSAP && !REDUCED;
+  var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  if (ANIM) { gsap.registerPlugin(ScrollTrigger); ScrollTrigger.clearScrollMemory('manual'); }
+
+  /* ---------- Preloader ---------- */
+  var pre = $('#preloader'), pct = $('#plPct'), liquid = $('#plLiquid'), p = 0, done = false, finished = false;
+  var tick = setInterval(function () {
+    p = Math.min(p + Math.random() * 20, done ? 100 : 92);
+    pct.textContent = Math.round(p) + '%';
+    liquid.style.height = p + '%';
+    if (p >= 100) finishLoad();
+  }, 100);
+  function finishLoad() {
+    if (finished) return;
+    finished = true;
+    clearInterval(tick);
+    pct.textContent = '100%'; liquid.style.height = '100%';
+    pre.classList.add('is-done');
+    document.body.classList.remove('is-loading');
+    setTimeout(function () { pre.style.display = 'none'; }, 700);
+    heroIntro();
+  }
+  window.addEventListener('load', function () { done = true; });
+  setTimeout(function () { done = true; }, 1200);
+  setTimeout(finishLoad, 3000);
+
+  /* ---------- Header: transparent over the hero, solid on scroll; the logo gets its plate ---------- */
+  var header = $('#siteHeader'), bar = $('#scrollBar');
+  var toTop = $('#toTop'), ttFill = $('#ttFill'), ringLen = 2 * Math.PI * 21;
+  ttFill.style.strokeDasharray = ringLen;
+  var wasSolid = false;
+  function onScroll() {
+    var y = window.scrollY, max = document.documentElement.scrollHeight - innerHeight;
+    var prog = max > 0 ? y / max : 0;
+    var solid = y > 40;
+    if (solid !== wasSolid) {
+      header.classList.toggle('is-solid', solid);
+      wasSolid = solid;
+      if (ANIM) gsap.fromTo('.site-header .logo', { scale: .9, rotateX: solid ? -60 : 60 }, { scale: 1, rotateX: 0, duration: .6, ease: 'back.out(2)', clearProps: 'transform' });
+    }
+    bar.style.transform = 'scaleX(' + prog + ')';
+    ttFill.style.strokeDashoffset = ringLen * (1 - prog);
+    toTop.classList.toggle('is-on', y > 600);
+  }
+  toTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
+
+  /* ---------- Nav underline ---------- */
+  var navLinks = $('#navLinks'), navLine = $('#navLine');
+  function moveLine(a) {
+    if (!a) return;
+    navLine.style.width = a.offsetWidth + 'px';
+    navLine.style.transform = 'translateX(' + a.offsetLeft + 'px)';
+  }
+  $$('a', navLinks).forEach(function (a) { a.addEventListener('mouseenter', function () { moveLine(a); }); });
+  navLinks.addEventListener('mouseleave', function () { moveLine($('a.active', navLinks)); });
+  window.addEventListener('load', function () { moveLine($('a.active', navLinks)); });
+  window.addEventListener('resize', function () { moveLine($('a.active', navLinks)); });
+  moveLine($('a.active', navLinks));
+
+  /* ---------- Mobile menu (full screen) ---------- */
+  var menu = $('#mobileMenu'), scrim = $('#menuScrim'), burger = $('#hamburger');
+  function openMenu() {
+    menu.classList.add('is-open'); scrim.classList.add('is-on');
+    document.body.classList.add('menu-open');
+    burger.classList.add('is-open'); burger.setAttribute('aria-expanded', 'true'); burger.setAttribute('aria-label', 'Close menu');
+    menu.setAttribute('aria-hidden', 'false');
+    if (ANIM) gsap.from('.mm-links a', { x: 40, opacity: 0, duration: .45, stagger: .05, delay: .12, ease: 'power3.out', clearProps: 'transform,opacity' });
+  }
+  function closeMenu() {
+    menu.classList.remove('is-open'); scrim.classList.remove('is-on');
+    document.body.classList.remove('menu-open');
+    burger.classList.remove('is-open'); burger.setAttribute('aria-expanded', 'false'); burger.setAttribute('aria-label', 'Open menu');
+    menu.setAttribute('aria-hidden', 'true');
+  }
+  burger.addEventListener('click', function () { menu.classList.contains('is-open') ? closeMenu() : openMenu(); });
+  $('#mobileMenuClose').addEventListener('click', closeMenu);
+  scrim.addEventListener('click', closeMenu);
+  $$('a', menu).forEach(function (a) { a.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', function () { if (innerWidth > 1024) closeMenu(); });
+
+  /* ---------- Smooth in-page anchors ---------- */
+  $$('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var id = a.getAttribute('href');
+      var t = id.length > 1 && document.querySelector(id);
+      if (!t) return;
+      e.preventDefault();
+      window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - 70, behavior: REDUCED ? 'auto' : 'smooth' });
+    });
+  });
+
+  /* =========================================================
+     HERO — gentle intro (no 3D here, just a calm entrance)
+     ========================================================= */
+  function heroIntro() {
+    if (!ANIM) return;
+    var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.crumbs, .ch-status', { y: 16, opacity: 0, duration: .5, stagger: .08, clearProps: 'transform,opacity' })
+      .from('.c-hero h1', { y: 30, opacity: 0, duration: .8, clearProps: 'transform,opacity' }, '-=.25')
+      .from('.ch-sub, .ch-actions > *', { y: 18, opacity: 0, duration: .55, stagger: .08, clearProps: 'transform,opacity' }, '-=.45')
+      .from('.ch-card', { x: 40, opacity: 0, duration: .8, clearProps: 'transform,opacity' }, .3)
+      .from('.ch-list li', { x: 20, opacity: 0, duration: .45, stagger: .07, clearProps: 'transform,opacity' }, .55);
+  }
+
+  /* =========================================================
+     LIVE HOURS — always worked out in Salem time (IST)
+     ========================================================= */
+  function istNow() {
+    var parts = {};
+    try {
+      new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', weekday: 'short', hour12: false })
+        .formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+    } catch (e) {
+      var d = new Date(Date.now() + (330 + new Date().getTimezoneOffset()) * 60000);
+      parts = { hour: String(d.getHours()), minute: String(d.getMinutes()), weekday: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] };
+    }
+    var h = parseInt(parts.hour, 10) % 24, m = parseInt(parts.minute, 10);
+    var day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.weekday);
+    return { mins: h * 60 + m, day: day, h: h, m: m };
+  }
+  function toMins(t) { var a = t.split(':'); return parseInt(a[0], 10) * 60 + parseInt(a[1], 10); }
+  function fmt12(mins) {
+    var h = Math.floor(mins / 60) % 24, m = mins % 60, ap = h >= 12 ? 'PM' : 'AM';
+    var hh = h % 12 || 12;
+    return hh + (m ? ':' + (m < 10 ? '0' : '') + m : '') + ' ' + ap;
+  }
+  function paintHours() {
+    var now = istNow();
+    $('#istNow').textContent = fmt12(now.mins).replace(' ', ' ') + ' · ' + ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.day];
+    // hero badge follows the main lab hours
+    var openLab = now.mins >= toMins('06:30') && now.mins < toMins('21:00');
+    var st = $('#openStatus');
+    st.classList.toggle('is-closed', !openLab);
+    $('#openText').textContent = openLab
+      ? 'Lab open now · closes at 9 PM'
+      : 'Lab closed now · opens at 6:30 AM · pathologist on call 24 × 7';
+    $$('.hrs li').forEach(function (li) {
+      var days = li.dataset.days ? li.dataset.days.split(',').map(Number) : [0, 1, 2, 3, 4, 5, 6];
+      var o = toMins(li.dataset.open), c = li.dataset.close === '24:00' ? 1440 : toMins(li.dataset.close);
+      var open = days.indexOf(now.day) !== -1 && now.mins >= o && now.mins < c;
+      li.classList.toggle('is-open', open);
+      var stEl = li.querySelector('.h-state');
+      if (open) {
+        var left = c - now.mins;
+        stEl.textContent = c === 1440 && o === 0 ? 'Open now' : left <= 60 ? 'Closes soon' : 'Open now';
+        stEl.className = 'h-state ' + (left <= 60 && c !== 1440 ? 'soon' : 'on');
+      } else {
+        stEl.textContent = 'Closed';
+        stEl.className = 'h-state off';
+      }
+    });
+  }
+  paintHours();
+  setInterval(paintHours, 30000);
+
+  /* =========================================================
+     SCROLL MOTION — the page is fully visible without GSAP
+     ========================================================= */
+  if (ANIM) {
+    $$('[data-reveal]').forEach(function (el) {
+      gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 88%', once: true }, y: 40, opacity: 0, duration: .8, ease: 'power3.out', clearProps: 'transform,opacity' });
+    });
+    ScrollTrigger.batch('.way', {
+      start: 'top 90%', once: true,
+      onEnter: function (b) { gsap.from(b, { y: 50, opacity: 0, duration: .7, stagger: .09, ease: 'power3.out', clearProps: 'transform,opacity' }); }
+    });
+    gsap.from('.hrs li', { scrollTrigger: { trigger: '.hrs', start: 'top 85%', once: true }, x: 30, opacity: 0, duration: .55, stagger: .08, ease: 'power3.out', clearProps: 'transform,opacity' });
+  }
+
+  /* ---------- Ways cards: soft spotlight follows the mouse ---------- */
+  if (FINE) {
+    $$('.way').forEach(function (w) {
+      w.addEventListener('mousemove', function (e) {
+        var r = w.getBoundingClientRect();
+        w.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        w.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+    });
+  }
+
+  /* =========================================================
+     CONTACT FORM
+     ========================================================= */
+  var form = $('#cForm'), msg = $('#cfMsg');
+  $('#cfPhone').addEventListener('input', function (e) { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10); });
+  msg.addEventListener('input', function () { $('#cfCount').textContent = msg.value.length; });
+  function setErr(el, text) {
+    var f = el.closest('.cf-field');
+    f.classList.toggle('has-err', !!text);
+    f.querySelector('.cf-err').textContent = text || '';
+  }
+  ['cfName', 'cfPhone', 'cfEmail', 'cfTopic', 'cfMsg'].forEach(function (id) {
+    var el = $('#' + id);
+    el.addEventListener('input', function () { setErr(el, ''); });
+    el.addEventListener('change', function () { setErr(el, ''); });
+  });
+  $('#cfConsent').addEventListener('change', function () { $('#cfConsentErr').textContent = ''; });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('#cfName'), phone = $('#cfPhone'), email = $('#cfEmail'), topic = $('#cfTopic');
+    var ok = true;
+    if (name.value.trim().length < 2) { setErr(name, 'Please enter your name.'); ok = false; }
+    if (!/^[6-9]\d{9}$/.test(phone.value)) { setErr(phone, 'Enter a valid 10-digit mobile number.'); ok = false; }
+    if (email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) { setErr(email, 'That email doesn\'t look right.'); ok = false; }
+    var reply = (form.querySelector('input[name=reply]:checked') || {}).value || 'Phone call';
+    if (reply === 'Email' && !email.value.trim()) { setErr(email, 'Add your email so we can reply by email.'); ok = false; }
+    if (!topic.value) { setErr(topic, 'Choose a topic.'); ok = false; }
+    if (msg.value.trim().length < 10) { setErr(msg, 'Please write at least a few words (10+ characters).'); ok = false; }
+    if (!$('#cfConsent').checked) { $('#cfConsentErr').textContent = 'Please tick the box so we can contact you.'; ok = false; }
+    if (!ok) {
+      var first = form.querySelector('.has-err input, .has-err select, .has-err textarea') || $('#cfConsent');
+      first.focus();
+      if (ANIM) gsap.fromTo(form, { x: -8 }, { x: 0, duration: .5, ease: 'elastic.out(1, .3)', clearProps: 'transform' });
+      return;
+    }
+    var ticket = 'CT-' + Math.floor(100000 + Math.random() * 900000);
+    var how = reply === 'Email' ? 'email you at ' + email.value.trim() : reply === 'WhatsApp' ? 'WhatsApp you on ' + phone.value.replace(/(\d{5})(\d{5})/, '$1 $2') : 'call you on ' + phone.value.replace(/(\d{5})(\d{5})/, '$1 $2');
+    var now = istNow(), open = now.mins >= toMins('06:30') && now.mins < toMins('21:00');
+    $('#cfDoneText').textContent = 'Thanks, ' + name.value.trim().split(' ')[0] + '. Our care team will ' + how + ' about "' + topic.value.toLowerCase() + '" ' + (open ? 'within the hour.' : 'first thing tomorrow morning.');
+    $('#cfTicket').textContent = 'Reference ' + ticket;
+    $('#cfDone').hidden = false;
+    if (ANIM) gsap.from('#cfDone', { y: 20, opacity: 0, duration: .6, ease: 'power3.out', clearProps: 'transform,opacity' });
+  });
+  $('#cfAgain').addEventListener('click', function () {
+    form.reset(); $('#cfCount').textContent = '0'; $('#cfDone').hidden = true; $('#cfName').focus();
+  });
+
+  /* ---------- FAQ accordion ---------- */
+  $$('.acc-item').forEach(function (item) {
+    $('.acc-q', item).addEventListener('click', function () {
+      var open = item.classList.contains('is-open');
+      $$('.acc-item').forEach(function (x) { x.classList.remove('is-open'); $('.acc-q', x).setAttribute('aria-expanded', 'false'); });
+      if (!open) { item.classList.add('is-open'); $('.acc-q', item).setAttribute('aria-expanded', 'true'); }
+    });
+  });
+
+  /* ---------- Scroll loop ---------- */
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { onScroll(); ticking = false; });
+  }, { passive: true });
+  window.addEventListener('load', function () { if (ANIM) ScrollTrigger.refresh(); });
+  onScroll();
+})();
+</script>
+</body>
+</html>

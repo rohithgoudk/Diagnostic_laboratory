@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In – Diagnostic Laboratory</title>
+  <meta name="description" content="Sign in to view your lab reports, track samples and manage tests.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/login.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body>
+
+  <!-- ========== Background: graph-paper grid, petri dishes, cells, molecules ========== -->
+  <div class="bg" aria-hidden="true">
+    <div class="bg-paper"></div>
+    <div class="bg-glow bg-glow--one"></div>
+    <div class="bg-glow bg-glow--two"></div>
+
+    <div class="dish dish--one">
+      <span class="dish-ring"></span><span class="dish-ring"></span>
+      <i style="--x:30%;--y:34%;--s:14px"></i><i style="--x:58%;--y:26%;--s:9px"></i>
+      <i style="--x:66%;--y:58%;--s:18px"></i><i style="--x:36%;--y:66%;--s:11px"></i>
+      <i style="--x:48%;--y:46%;--s:7px"></i>
+    </div>
+    <div class="dish dish--two">
+      <span class="dish-ring"></span><span class="dish-ring"></span>
+      <i style="--x:28%;--y:40%;--s:12px"></i><i style="--x:62%;--y:32%;--s:16px"></i>
+      <i style="--x:52%;--y:64%;--s:10px"></i>
+    </div>
+
+    <svg class="mol mol--one" viewBox="0 0 120 100">
+      <path d="M20 70 L50 50 L80 62 L100 30 M50 50 L46 18"/>
+      <circle cx="20" cy="70" r="7"/><circle cx="50" cy="50" r="9"/><circle cx="80" cy="62" r="7"/>
+      <circle cx="100" cy="30" r="6"/><circle cx="46" cy="18" r="6"/>
+    </svg>
+    <svg class="mol mol--two" viewBox="0 0 120 100">
+      <path d="M16 40 L46 26 L76 44 L76 76 M46 26 L52 4 M76 44 L104 32"/>
+      <circle cx="16" cy="40" r="6"/><circle cx="46" cy="26" r="8"/><circle cx="76" cy="44" r="8"/>
+      <circle cx="76" cy="76" r="6"/><circle cx="52" cy="4" r="4"/><circle cx="104" cy="32" r="6"/>
+    </svg>
+
+    <span class="cell" style="--x: 2%;  --y: 46%; --s: 46px"></span>
+    <span class="cell" style="--x: 60%; --y: 3%;  --s: 34px"></span>
+    <span class="cell" style="--x: 90%; --y: 12%; --s: 30px"></span>
+    <span class="cell" style="--x: 54%; --y: 6%;  --s: 22px"></span>
+  </div>
+
+  <!-- ========== Top bar ========== -->
+  <header class="topbar">
+    <a href="index.html" class="back-home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+      <span>Back to home</span>
+    </a>
+    <span class="status-pill"><span class="pulse"></span>Lab systems online</span>
+  </header>
+
+  <main class="login-layout">
+
+    <!-- ========== Left: lab showcase (desktop / tablet) ========== -->
+    <section class="showcase" aria-hidden="true">
+      <p class="showcase__tag"><span class="tag-dot"></span>Patient &amp; staff portal</p>
+      <h2 class="showcase__title">Accurate results, <span class="grad-text">delivered fast.</span></h2>
+      <p class="showcase__text">Track every sample from collection to report, and open verified results the moment they're signed off.</p>
+
+      <!-- Sample tracker -->
+      <div class="tracker">
+        <div class="tracker__head">
+          <div>
+            <span class="tracker__label">Sample</span>
+            <b class="tracker__id">#LB-24817</b>
+          </div>
+          <span class="tracker__badge">Processing</span>
+        </div>
+        <ol class="steps">
+          <li class="step is-done"><span class="step__dot"></span><b>Collected</b><em>08:12</em></li>
+          <li class="step is-done"><span class="step__dot"></span><b>Received</b><em>09:40</em></li>
+          <li class="step is-live"><span class="step__dot"></span><b>Analysing</b><em>now</em></li>
+          <li class="step"><span class="step__dot"></span><b>Report</b><em>~14:00</em></li>
+          <span class="steps__track"><span class="steps__fill"></span></span>
+        </ol>
+      </div>
+
+      <!-- Results with reference ranges -->
+      <div class="results">
+        <div class="results__head">
+          <span class="results__title">Complete blood count</span>
+          <span class="results__meta">Reference range</span>
+        </div>
+        <div class="res">
+          <span class="res__name">Haemoglobin</span>
+          <span class="res__val">13.8 <small>g/dL</small></span>
+          <span class="res__range"><span class="res__ok"></span><i class="res__mark" style="--p:52%"></i></span>
+          <span class="res__ref">13.0–17.0</span>
+        </div>
+        <div class="res">
+          <span class="res__name">Glucose (fasting)</span>
+          <span class="res__val">92 <small>mg/dL</small></span>
+          <span class="res__range"><span class="res__ok"></span><i class="res__mark" style="--p:44%"></i></span>
+          <span class="res__ref">70–100</span>
+        </div>
+        <div class="res">
+          <span class="res__name">TSH</span>
+          <span class="res__val">2.1 <small>mIU/L</small></span>
+          <span class="res__range"><span class="res__ok"></span><i class="res__mark" style="--p:40%"></i></span>
+          <span class="res__ref">0.4–4.0</span>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div><b>1,200+</b><span>tests on menu</span></div>
+        <div><b>24 h</b><span>most reports</span></div>
+        <div><b>98.6%</b><span>on-time delivery</span></div>
+      </div>
+    </section>
+
+    <!-- ========== Right: sign-in card ========== -->
+    <section class="card-wrap">
+      <div class="card" id="card">
+
+        <a href="index.html" class="logo" aria-label="Go to homepage">
+          <img src="../assets/Logo.webp" alt="Company logo">
+        </a>
+
+        <p class="kicker"><span class="kicker__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-2.5L14 9V3"/><path d="M7 15h10"/></svg></span>Lab portal</p>
+        <h1 class="card__title">Welcome back</h1>
+        <p class="card__sub">Sign in to see your reports. No account yet? <a href="signup.html">Create an account</a></p>
+
+        <!-- Role toggle -->
+        <div class="role-toggle" id="roleToggle" role="tablist" aria-label="Sign in as">
+          <span class="role-ind" id="roleInd"></span>
+          <button type="button" class="role-btn active" data-role="user" role="tab" aria-selected="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+            User
+          </button>
+          <button type="button" class="role-btn" data-role="admin" role="tab" aria-selected="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M12 9v6M9 12h6"/></svg>
+            Admin
+          </button>
+        </div>
+
+        <form class="form" id="loginForm" novalidate>
+
+          <div class="field" id="emailField">
+            <label for="email">Email address</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+              <input type="email" id="email" placeholder="name@example.com" autocomplete="email" required>
+            </div>
+            <span class="field-error">Enter a valid email address.</span>
+          </div>
+
+          <div class="field" id="passwordField">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+              <input type="password" id="password" class="pw-input" placeholder="Enter your password" autocomplete="current-password" required>
+              <!-- Single custom toggle. Browser's built-in reveal icon is hidden in CSS -->
+              <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password" aria-pressed="false">
+                <svg class="eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.66 3.79"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+              </button>
+            </div>
+            <span class="field-error">Enter your password.</span>
+          </div>
+
+          <div class="row">
+            <label class="check">
+              <input type="checkbox" id="remember" checked>
+              <span class="check__box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>Keep me signed in</span>
+            </label>
+            <a href="404.html" class="link">Forgot password?</a>
+          </div>
+
+          <div class="field" id="acceptField">
+            <label class="check">
+              <input type="checkbox" id="accept">
+              <span class="check__box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+              <span>I accept the <a href="404.html">terms of service</a> and <a href="404.html">privacy policy</a>.</span>
+            </label>
+            <span class="field-error">Accept the terms before signing in.</span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span class="btn-submit__label" id="submitLabel">Sign in as User</span>
+            <svg class="btn-submit__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/></svg>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <p class="card__foot">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+          Encrypted connection. Patient data stays confidential.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+    var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var ANIM = !!window.gsap && !REDUCED;
+    var $ = function (s, c) { return (c || document).querySelector(s); };
+    var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+
+    /* ---------- Role toggle ---------- */
+    var selectedRole = 'user';
+    var toggle = $('#roleToggle'), ind = $('#roleInd');
+    var buttons = $$('.role-btn', toggle), submitLabel = $('#submitLabel');
+
+    function placeIndicator() {
+      var active = $('.role-btn.active', toggle);
+      ind.style.width = active.offsetWidth + 'px';
+      ind.style.transform = 'translateX(' + (active.offsetLeft - 4) + 'px)';
+    }
+    placeIndicator();
+    window.addEventListener('resize', placeIndicator);
+    window.addEventListener('load', placeIndicator);
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('active')) return;
+        buttons.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        selectedRole = btn.dataset.role;
+        window.selectedRole = selectedRole;
+        placeIndicator();
+        submitLabel.textContent = selectedRole === 'admin' ? 'Sign in as Admin' : 'Sign in as User';
+        if (ANIM) gsap.fromTo(submitLabel, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: .35, ease: 'power2.out' });
+      });
+    });
+
+    /* ---------- Show / hide password (one icon at a time) ---------- */
+    var pwToggle = $('#pwToggle'), pwInput = $('#password');
+    pwToggle.addEventListener('click', function () {
+      var show = pwInput.type === 'password';
+      pwInput.type = show ? 'text' : 'password';
+      pwToggle.classList.toggle('is-showing', show);
+      pwToggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      pwToggle.setAttribute('aria-pressed', String(show));
+      pwInput.focus();
+      var len = pwInput.value.length;
+      try { pwInput.setSelectionRange(len, len); } catch (e) {}
+    });
+
+    /* ---------- Validation + submit ---------- */
+    var form = $('#loginForm'), emailInput = $('#email'), acceptInput = $('#accept'), submitBtn = $('#submitBtn');
+
+    function isValidEmail(v) {
+      return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/.test(v.trim());
+    }
+    function flag(id, show) {
+      var el = document.getElementById(id);
+      el.classList.remove('has-error');
+      if (show) {
+        void el.offsetWidth;
+        el.classList.add('has-error');
+        if (ANIM) gsap.fromTo(el, { x: -8 }, { x: 0, duration: .5, ease: 'elastic.out(1, .3)' });
+      }
+    }
+
+    emailInput.addEventListener('input', function () { flag('emailField', false); });
+    pwInput.addEventListener('input', function () { flag('passwordField', false); });
+    acceptInput.addEventListener('change', function () { flag('acceptField', false); });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var ok = true;
+      if (!isValidEmail(emailInput.value)) { flag('emailField', true); ok = false; }
+      if (!pwInput.value) { flag('passwordField', true); ok = false; }
+      if (!acceptInput.checked) { flag('acceptField', true); ok = false; }
+      if (!ok) return;
+
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+      submitLabel.textContent = 'Verifying credentials…';
+
+      setTimeout(function () {
+        // Demo-only session (no backend): lets dashboard pages read who signed in.
+        try {
+          localStorage.setItem('user', JSON.stringify({ email: emailInput.value.trim(), role: selectedRole }));
+          localStorage.setItem('isAuthenticated', 'true');
+        } catch (err) {}
+
+        submitBtn.classList.remove('loading');
+        submitBtn.classList.add('success');
+        submitLabel.textContent = 'Opening your reports…';
+        setTimeout(function () {
+          window.location.href = selectedRole === 'admin' ? 'admindashboard.html' : 'dashboard.html';
+        }, 600);
+      }, 1200);
+    });
+
+    if (!ANIM) return;
+
+    /* ---------- Intro timeline ---------- */
+    var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.from('.topbar > *', { y: -24, opacity: 0, duration: .6, stagger: .1 })
+      .from('#card', { y: 50, opacity: 0, scale: .97, duration: .9 }, '-=.3')
+      .from('.card > *', { y: 18, opacity: 0, duration: .5, stagger: .05 }, '-=.6')
+      .from('.form .field, .form .row, .btn-submit', { y: 16, opacity: 0, duration: .5, stagger: .06 }, '-=.5')
+      .add(placeIndicator);
+
+    if (getComputedStyle($('.showcase')).display !== 'none') {
+      tl.from('.showcase > *', { x: -40, opacity: 0, duration: .8, stagger: .1 }, .2)
+        .from('.step', { y: 14, opacity: 0, duration: .4, stagger: .1 }, .9)
+        .fromTo('.steps__fill', { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: 'power2.inOut' }, 1.1)
+        .from('.res__mark', { left: '0%', duration: 1.1, stagger: .12, ease: 'expo.out' }, 1.2)
+        .from('.stats > div', { y: 20, opacity: 0, duration: .5, stagger: .08 }, 1.3);
+
+      gsap.to('.step.is-live .step__dot', { scale: 1.35, duration: .8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      gsap.to('.tracker__badge', { opacity: .55, duration: 1, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+    }
+
+    /* ---------- Ambient lab motion ---------- */
+    gsap.to('.dish--one', { rotation: 360, duration: 90, ease: 'none', repeat: -1 });
+    gsap.to('.dish--two', { rotation: -360, duration: 110, ease: 'none', repeat: -1 });
+    $$('.dish i').forEach(function (d) {
+      gsap.to(d, { scale: 'random(1.1, 1.5)', duration: 'random(2, 4)', repeat: -1, yoyo: true, ease: 'sine.inOut' });
+    });
+    $$('.mol').forEach(function (m, i) {
+      gsap.to(m, { y: i ? 24 : -24, rotation: i ? -12 : 12, duration: 7 + i * 2, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+    });
+    $$('.cell').forEach(function (c) {
+      gsap.to(c, { x: 'random(-40, 40)', y: 'random(-40, 40)', duration: 'random(6, 10)', repeat: -1, yoyo: true, ease: 'sine.inOut', repeatRefresh: true });
+    });
+    gsap.to('.tag-dot', { scale: 1.6, opacity: .4, duration: .8, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+
+    /* ---------- Gentle parallax (desktop only) ---------- */
+    if (FINE) {
+      var px = gsap.quickTo('.bg-paper', 'x', { duration: 1, ease: 'power3.out' });
+      var py = gsap.quickTo('.bg-paper', 'y', { duration: 1, ease: 'power3.out' });
+      var d1 = gsap.quickTo('.dish--one', 'x', { duration: 1.4, ease: 'power3.out' });
+      var d2 = gsap.quickTo('.dish--two', 'x', { duration: 1.4, ease: 'power3.out' });
+      window.addEventListener('pointermove', function (e) {
+        var nx = e.clientX / innerWidth - .5, ny = e.clientY / innerHeight - .5;
+        px(nx * -16); py(ny * -16); d1(nx * 30); d2(nx * -30);
+      });
+    }
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STACKLY Diagnostics — Accurate lab tests, faster reports</title>
+<meta name="description" content="NABL-accredited diagnostic laboratory in Salem. Blood tests, health packages and free home sample collection with digital reports in hours.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/index.css">
+<script>
+  /* Scroll position rules for this page:
+     · refresh                    → start at the top
+     · normal link to this page   → top (or the #section in the link)
+     · Back / "Go back" to here   → return to the exact spot you left */
+  (function () {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    var KEY = 'scrollPos:' + location.pathname;
+    var nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var type = nav.type || (performance.navigation && ['navigate', 'reload', 'back_forward'][performance.navigation.type]) || 'navigate';
+    var saved = null;
+    if (type === 'back_forward') { try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) {} }
+    var target = (location.hash && type === 'navigate') ? location.hash : '';
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    function save() { try { sessionStorage.setItem(KEY, JSON.stringify({ y: Math.round(window.scrollY) })); sessionStorage.setItem('lastPage', location.pathname); } catch (e) {} }
+    var userMoved = false;
+    function land() {
+      if (userMoved) return;
+      if (saved && typeof saved.y === 'number') { window.scrollTo(0, saved.y); return; }
+      var el = target && document.querySelector(target);
+      if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); else window.scrollTo(0, 0);
+    }
+    if (!saved) window.scrollTo(0, 0);
+    // remember where you were whenever you leave the page
+    window.addEventListener('pagehide', save);
+    document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href], button')) save(); }, true);
+    // stop re-positioning as soon as you start scrolling yourself
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function () { userMoved = true; }, { passive: true, once: true }); });
+    window.addEventListener('load', function () { land(); setTimeout(land, 80); setTimeout(land, 450); setTimeout(land, 1300); });
+  })();
+</script>
+</head>
+<body class="is-loading">
+
+<!-- ============ PRELOADER — a sample tube fills while the page loads ============ -->
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="pl-inner">
+    <div class="pl-tube"><span class="pl-cap"></span><span class="pl-liquid" id="plLiquid"></span></div>
+    <div class="pl-word"><span>S</span><span>T</span><span>A</span><span>C</span><span>K</span><span>L</span><span>Y</span></div>
+    <div class="pl-text">Preparing your lab <b id="plPct">0%</b></div>
+  </div>
+</div>
+
+<!-- ============ HEADER — transparent over the hero, turns solid on scroll ============ -->
+<header class="site-header" id="siteHeader">
+  <nav class="nav wrap">
+    <!-- Logo — replace src with your logo, e.g. ../assets/Logo.webp -->
+    <a href="index.html" class="logo" aria-label="Home">
+      <span class="logo-shine" aria-hidden="true"></span>
+      <img src="../assets/Logo.webp" alt="Company logo">
+    </a>
+
+    <div class="nav-links" id="navLinks">
+      <a href="#hero" class="active">Home</a>
+      <a href="services.html">Services</a>
+      <a href="about.html">About</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+      <span class="nav-line" id="navLine" aria-hidden="true"></span>
+    </div>
+
+    <div class="nav-right">
+      <a href="login.html" class="nav-login">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+        Login
+      </a>
+      <a href="signup.html" class="btn btn-primary btn-sm nav-signup">
+        <svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c1.2-3.4 4.2-5 6.5-5s5.3 1.6 6.5 5"/><path d="M19 8v6M22 11h-6"/></svg>
+        Sign Up
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="scroll-bar" id="scrollBar" aria-hidden="true"></div>
+</header>
+
+<!-- ============ MOBILE MENU — slides in from the right ============ -->
+<div class="menu-scrim" id="menuScrim"></div>
+<aside class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Menu">
+  <div class="mm-top">
+    <a href="index.html" class="logo logo--plate" aria-label="Home">
+      <img src="../assets/Logo.webp" alt="Company logo">
+    </a>
+    <button class="mm-close" id="mobileMenuClose" aria-label="Close menu">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav class="mm-links">
+    <a href="#hero" class="active"><em>01</em>Home</a>
+    <a href="services.html"><em>02</em>Services</a>
+    <a href="about.html"><em>03</em>About</a>
+    <a href="blog.html"><em>04</em>Blog</a>
+    <a href="contact.html"><em>05</em>Contact</a>
+  </nav>
+  <div class="mm-actions">
+    <a href="login.html" class="btn btn-ghost">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c1.5-4 5-6 7.5-6s6 2 7.5 6"/></svg>
+      Login
+    </a>
+    <a href="signup.html" class="btn btn-primary">
+      <svg viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c1.2-3.4 4.2-5 6.5-5s5.3 1.6 6.5 5"/><path d="M19 8v6M22 11h-6"/></svg>
+      Sign Up
+    </a>
+  </div>
+  <p class="mm-note"><span class="live-dot"></span>Lab open today · 6:30 AM – 9 PM</p>
+</aside>
+
+<main>
+
+<!-- ============ 1. HERO — centred copy, rotating 3D DNA helices, floating result cards ============ -->
+<section class="hero" id="hero">
+  <div class="hero-grid-bg" aria-hidden="true"></div>
+  <div class="hero-glow g1" aria-hidden="true"></div>
+  <div class="hero-glow g2" aria-hidden="true"></div>
+
+  <div class="hero-stage" id="heroStage" aria-hidden="true">
+    <div class="helix helix--left" data-depth="0.6"><div class="helix-spin" id="helixL"></div></div>
+    <div class="helix helix--right" data-depth="0.9"><div class="helix-spin" id="helixR"></div></div>
+
+    <div class="float-card fc1" data-depth="1.6">
+      <span class="fc-ico fc-ok"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span>
+      <span><small>HbA1c result</small><b>5.4% · Normal</b></span>
+    </div>
+    <div class="float-card fc2" data-depth="1.2">
+      <span class="fc-ico"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg></span>
+      <span><small>Report ready in</small><b id="fcTime">5 h 42 m</b></span>
+    </div>
+    <div class="float-card fc3" data-depth="1.9">
+      <span class="live-dot"></span>
+      <span><small>Phlebotomist en route</small><b>Arriving 7:30 AM</b></span>
+    </div>
+    <div class="float-tube ft1" data-depth="2.2"><i></i></div>
+    <div class="float-tube ft2" data-depth="1.4"><i></i></div>
+    <div class="float-cell fcl1" data-depth="2.6"></div>
+    <div class="float-cell fcl2" data-depth="1.1"></div>
+  </div>
+
+  <div class="wrap hero-copy" id="heroCopy">
+    <span class="eyebrow"><span class="live-dot"></span>NABL-accredited diagnostic laboratory · Salem</span>
+    <h1 class="hero-title">
+      <span class="ht-line"><span class="ht-word">Accurate</span> <span class="ht-word">tests.</span></span>
+      <span class="rotator" id="rotator" aria-live="polite">
+        <span class="rot-word is-on">Faster reports.</span>
+        <span class="rot-word">Home collection.</span>
+        <span class="rot-word">Trusted results.</span>
+        <span class="rot-word">Peace of mind.</span>
+      </span>
+    </h1>
+    <p class="hero-sub">Over 1,200 blood, hormone and pathology tests run on fully automated analysers, checked by senior pathologists and delivered to your phone — most within the same day.</p>
+
+    <form class="hero-search" id="heroSearch" autocomplete="off" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2"/></svg>
+      <input id="heroSearchInput" placeholder="Search a test, e.g. Thyroid or HbA1c" aria-label="Search a test">
+      <button type="submit" class="btn btn-primary">Find test</button>
+    </form>
+    <div class="hero-chips">
+      <span>Popular:</span>
+      <button type="button" class="hchip" data-q="CBC">CBC</button>
+      <button type="button" class="hchip" data-q="Thyroid">Thyroid</button>
+      <button type="button" class="hchip" data-q="Lipid">Lipid profile</button>
+      <button type="button" class="hchip" data-q="Vitamin">Vitamin D</button>
+    </div>
+    <p class="hero-msg" id="heroMsg" role="status"></p>
+
+    <div class="hero-actions">
+      <a href="404.html" class="btn btn-primary btn-lg">Book a test
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="404.html" class="btn btn-glass btn-lg">
+        <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>
+        Free home collection
+      </a>
+    </div>
+
+    <ul class="hero-stats">
+      <li><b><span data-count="2" data-decimals="0">0</span>M+</b><span>tests reported</span></li>
+      <li><b><span data-count="4.9" data-decimals="1">0</span>★</b><span>Google rating</span></li>
+      <li><b><span data-count="6">0</span> h</b><span>average report time</span></li>
+      <li><b><span data-count="18">0</span></b><span>collection centres</span></li>
+    </ul>
+  </div>
+
+  
+</section>
+
+<!-- ============ 2. ACCREDITATIONS — endless marquee ============ -->
+<section class="trust" id="trust" aria-label="Accreditations and partners">
+  <div class="marquee">
+    <div class="marquee-track">
+      <span><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3zM9 12l2 2 4-4"/></svg>NABL · ISO 15189</span>
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.5 14l-1.5 7 5-3 5 3-1.5-7"/></svg>ISO 9001:2015</span>
+      <span><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>EQAS proficiency tested</span>
+      <span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>Digital reports in hours</span>
+      <span><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Free home collection</span>
+      <span><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Open 7 days · 6:30 AM</span>
+      <span><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3zM9 12l2 2 4-4"/></svg>NABL · ISO 15189</span>
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.5 14l-1.5 7 5-3 5 3-1.5-7"/></svg>ISO 9001:2015</span>
+      <span><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>EQAS proficiency tested</span>
+      <span><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>Digital reports in hours</span>
+      <span><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Free home collection</span>
+      <span><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Open 7 days · 6:30 AM</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. POPULAR TESTS — filterable cards, 3D tilt images ============ -->
+<section class="section tests" id="tests">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Popular tests</span>
+      <h2>The tests doctors <span class="grad">ask for most</span></h2>
+      <p>Transparent prices, clear preparation steps and a report time you can plan around.</p>
+    </div>
+
+    <div class="filter" id="testFilter" role="tablist" aria-label="Test categories" data-reveal>
+      <button class="ftab is-on" data-cat="all" role="tab" aria-selected="true">All tests</button>
+      <button class="ftab" data-cat="blood" role="tab" aria-selected="false">Blood</button>
+      <button class="ftab" data-cat="hormone" role="tab" aria-selected="false">Hormones</button>
+      <button class="ftab" data-cat="heart" role="tab" aria-selected="false">Heart &amp; diabetes</button>
+      <button class="ftab" data-cat="infection" role="tab" aria-selected="false">Infection</button>
+    </div>
+
+    <div class="test-grid" id="testGrid">
+      <article class="test-card tilt" data-cat="blood">
+        <figure class="ph tc-img"><img src="https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=800&q=70" alt="Lab scientist reading results on an automated analyser screen" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="tc-body">
+          <span class="tc-tag">72 parameters</span>
+          <h3>Full body checkup</h3>
+          <ul class="tc-facts"><li><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Report in 24 h</li><li><svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>10–12 h fasting</li></ul>
+          <div class="tc-foot"><span class="price"><b>₹1,499</b><s>₹2,999</s></span><a href="404.html" class="btn btn-primary btn-sm">Book</a></div>
+        </div>
+      </article>
+      <article class="test-card tilt" data-cat="heart">
+        <figure class="ph tc-img"><img src="https://images.unsplash.com/photo-1697192156499-d85cfe1452c0?auto=format&fit=crop&w=800&q=70" alt="Gloved hand holding a blood sample tube" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="tc-body">
+          <span class="tc-tag">Diabetes</span>
+          <h3>HbA1c + fasting glucose</h3>
+          <ul class="tc-facts"><li><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Report in 6 h</li><li><svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>8 h fasting</li></ul>
+          <div class="tc-foot"><span class="price"><b>₹549</b><s>₹800</s></span><a href="404.html" class="btn btn-primary btn-sm">Book</a></div>
+        </div>
+      </article>
+      <article class="test-card tilt" data-cat="hormone">
+        <figure class="ph tc-img"><img src="https://images.unsplash.com/photo-1578496480240-32d3e0c04525?auto=format&fit=crop&w=800&q=70" alt="Lab technician holding test tubes" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="tc-body">
+          <span class="tc-tag">T3 · T4 · TSH</span>
+          <h3>Thyroid profile</h3>
+          <ul class="tc-facts"><li><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Report in 8 h</li><li><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>No fasting needed</li></ul>
+          <div class="tc-foot"><span class="price"><b>₹399</b><s>₹650</s></span><a href="404.html" class="btn btn-primary btn-sm">Book</a></div>
+        </div>
+      </article>
+      <article class="test-card tilt" data-cat="heart">
+        <figure class="ph tc-img"><img src="https://images.unsplash.com/photo-1606206591513-adbfbdd7a177?auto=format&fit=crop&w=800&q=70" alt="Rows of blood collection tubes with coloured caps in a rack" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="tc-body">
+          <span class="tc-tag">Heart health</span>
+          <h3>Lipid profile</h3>
+          <ul class="tc-facts"><li><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Report in 6 h</li><li><svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>10–12 h fasting</li></ul>
+          <div class="tc-foot"><span class="price"><b>₹449</b><s>₹700</s></span><a href="404.html" class="btn btn-primary btn-sm">Book</a></div>
+        </div>
+      </article>
+      <article class="test-card tilt" data-cat="blood">
+        <figure class="ph tc-img"><img src="https://images.unsplash.com/photo-1639772823849-6efbd173043c?auto=format&fit=crop&w=800&q=70" alt="Gloved hand holding a sample tube in the lab" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="tc-body">
+          <span class="tc-tag">Deficiency</span>
+          <h3>Vitamin D &amp; B12</h3>
+          <ul class="tc-facts"><li><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Report in 12 h</li><li><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>No fasting needed</li></ul>
+          <div class="tc-foot"><span class="price"><b>₹999</b><s>₹1,800</s></span><a href="404.html" class="btn btn-primary btn-sm">Book</a></div>
+        </div>
+      </article>
+      <article class="test-card tilt" data-cat="infection">
+        <figure class="ph tc-img"><img src="https://images.unsplash.com/photo-1581091007718-0c50d599bfd0?auto=format&fit=crop&w=800&q=70" alt="Petri dish placed under a laboratory microscope" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="tc-body">
+          <span class="tc-tag">Dengue · Typhoid · Malaria</span>
+          <h3>Fever panel</h3>
+          <ul class="tc-facts"><li><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg>Report in 6 h</li><li><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>No fasting needed</li></ul>
+          <div class="tc-foot"><span class="price"><b>₹899</b><s>₹1,400</s></span><a href="404.html" class="btn btn-primary btn-sm">Book</a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. HOW IT WORKS — the line draws as you scroll ============ -->
+<section class="section process" id="process">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">How it works</span>
+      <h2>From booking to report <span class="grad">in four steps</span></h2>
+    </div>
+    <div class="steps">
+      <div class="steps-line" aria-hidden="true"><span id="stepsFill"></span></div>
+      <article class="step">
+        <span class="step-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M10 18h4"/></svg><em>01</em></span>
+        <h3>Book in a minute</h3>
+        <p>Pick a test or package online, on WhatsApp or by phone, and choose a time slot.</p>
+      </article>
+      <article class="step">
+        <span class="step-ico"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg><em>02</em></span>
+        <h3>Sample at home</h3>
+        <p>A certified phlebotomist visits with sealed, single-use kits — or walk into any centre.</p>
+      </article>
+      <article class="step">
+        <span class="step-ico"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-2.5L14 9V3M7 15h10"/></svg><em>03</em></span>
+        <h3>Tested in our lab</h3>
+        <p>Barcoded samples run on automated analysers with daily quality control.</p>
+      </article>
+      <article class="step">
+        <span class="step-ico"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 14l2 2 4-4"/></svg><em>04</em></span>
+        <h3>Report on your phone</h3>
+        <p>A pathologist signs off and your report arrives by SMS, email and in your account.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. HEALTH PACKAGES — individual / family toggle ============ -->
+<section class="section packages" id="packages">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Health packages</span>
+      <h2>Preventive checkups, <span class="grad">priced honestly</span></h2>
+      <div class="pk-toggle" role="group" aria-label="Package for">
+        <span class="pk-label is-on" data-who="one">For one person</span>
+        <button class="pk-switch" id="pkSwitch" role="switch" aria-checked="false" aria-label="Family of four pricing"><span></span></button>
+        <span class="pk-label" data-who="family">Family of 4 <em>Save 25%</em></span>
+      </div>
+    </div>
+    <div class="pk-grid">
+      <article class="pk-card" data-reveal>
+        <h3>Essential</h3>
+        <p class="pk-desc">A yearly baseline for adults under 35.</p>
+        <div class="pk-price">₹<b data-one="999" data-family="2,999">999</b><span class="pk-per" data-one="/ person" data-family="/ family">/ person</span></div>
+        <a href="404.html" class="btn btn-ghost btn-block">Book Essential</a>
+        <ul class="ticks"><li>Complete blood count</li><li>Fasting blood sugar</li><li>Lipid profile</li><li>Liver &amp; kidney function</li><li>Urine routine</li></ul>
+      </article>
+      <article class="pk-card is-pop" data-reveal>
+        <span class="pop-tag">Most booked</span>
+        <h3>Comprehensive</h3>
+        <p class="pk-desc">Everything in Essential plus hormones and vitamins.</p>
+        <div class="pk-price">₹<b data-one="2,499" data-family="7,499">2,499</b><span class="pk-per" data-one="/ person" data-family="/ family">/ person</span></div>
+        <a href="404.html" class="btn btn-primary btn-block">Book Comprehensive</a>
+        <ul class="ticks"><li>All Essential tests</li><li>HbA1c &amp; thyroid profile</li><li>Vitamin D &amp; B12</li><li>Iron studies</li><li>Free doctor consultation</li></ul>
+      </article>
+      <article class="pk-card" data-reveal>
+        <h3>Advanced</h3>
+        <p class="pk-desc">For 40+ or a family history of heart disease.</p>
+        <div class="pk-price">₹<b data-one="4,999" data-family="14,999">4,999</b><span class="pk-per" data-one="/ person" data-family="/ family">/ person</span></div>
+        <a href="404.html" class="btn btn-ghost btn-block">Book Advanced</a>
+        <ul class="ticks"><li>All Comprehensive tests</li><li>Cardiac risk markers (hs-CRP, Lp(a))</li><li>Tumour markers</li><li>ECG at the centre</li><li>Diet plan from a nutritionist</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. INSIDE OUR LAB — sticky 3D image swaps as you scroll ============ -->
+<section class="section lab" id="lab">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Inside our lab</span>
+      <h2>Precision you can <span class="grad">see for yourself</span></h2>
+    </div>
+    <div class="lab-grid">
+      <div class="lab-steps">
+        <article class="lab-step is-active" data-step="0">
+          <span class="step-no">01</span>
+          <h3>Fully automated analysers</h3>
+          <p>Barcoded tubes go straight onto chemistry, haematology and immunoassay analysers. No hand-written labels, no mix-ups.</p>
+          <ul><li>Up to 1,800 tests an hour</li><li>Results flow straight to your report</li></ul>
+        </article>
+        <article class="lab-step" data-step="1">
+          <span class="step-no">02</span>
+          <h3>Quality checked every morning</h3>
+          <p>Control samples run before any patient sample. If a single control drifts, testing stops until it is fixed.</p>
+          <ul><li>Daily internal QC with Westgard rules</li><li>Monthly external proficiency testing</li></ul>
+        </article>
+        <article class="lab-step" data-step="2">
+          <span class="step-no">03</span>
+          <h3>Reviewed by a pathologist</h3>
+          <p>Every report is reviewed and signed by a senior pathologist. Critical values are phoned to your doctor within 30 minutes.</p>
+          <ul><li>MD pathologists on every shift</li><li>Second opinion on unusual results</li></ul>
+        </article>
+      </div>
+      <div class="lab-frame">
+        <div class="lab-sticky" id="labSticky">
+          <figure class="ph lab-img is-active" data-img="0"><img src="https://images.unsplash.com/photo-1732690233982-1d4567384ea1?auto=format&fit=crop&w=1000&q=70" alt="Lab scientist in gloves operating an automated analyser" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+          <figure class="ph lab-img" data-img="1"><img src="https://images.unsplash.com/photo-1579165466949-3180a3d056d5?auto=format&fit=crop&w=1000&q=70" alt="Scientist in a blue gown using a pipette" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+          <figure class="ph lab-img" data-img="2"><img src="https://images.unsplash.com/photo-1630959305790-4c956ce6c0b6?auto=format&fit=crop&w=1000&q=70" alt="Pathologist in a white coat looking through a microscope" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+          <div class="lab-badge"><span class="live-dot"></span><span id="labLabel">Analysers online</span></div>
+          <div class="lab-dots"><i class="on"></i><i></i><i></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. NUMBERS — counters and rings on a dark band ============ -->
+<section class="section stats" id="stats">
+  <div class="stats-bg" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="sec-head sec-head--light" data-reveal>
+      <span class="kicker">By the numbers</span>
+      <h2>Trusted by families <span class="grad">across Salem</span></h2>
+    </div>
+    <div class="stat-grid">
+      <div class="stat" data-reveal>
+        <div class="stat-ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="sr-bg"/><circle cx="40" cy="40" r="34" class="sr-fg" data-pct="92"/></svg><svg class="sr-ico" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-2.5L14 9V3"/></svg></div>
+        <b><span data-count="2.1" data-decimals="1">0</span>M+</b><span>tests reported since 2012</span>
+      </div>
+      <div class="stat" data-reveal>
+        <div class="stat-ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="sr-bg"/><circle cx="40" cy="40" r="34" class="sr-fg" data-pct="99.6"/></svg><svg class="sr-ico" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3zM9 12l2 2 4-4"/></svg></div>
+        <b><span data-count="99.6" data-decimals="1">0</span>%</b><span>external quality score</span>
+      </div>
+      <div class="stat" data-reveal>
+        <div class="stat-ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="sr-bg"/><circle cx="40" cy="40" r="34" class="sr-fg" data-pct="75"/></svg><svg class="sr-ico" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l3 2"/></svg></div>
+        <b><span data-count="6">0</span> h</b><span>average routine report time</span>
+      </div>
+      <div class="stat" data-reveal>
+        <div class="stat-ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="sr-bg"/><circle cx="40" cy="40" r="34" class="sr-fg" data-pct="85"/></svg><svg class="sr-ico" viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></div>
+        <b><span data-count="18">0</span></b><span>collection centres in Salem district</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. HOME COLLECTION — pincode check ============ -->
+<section class="section home" id="home-collection">
+  <div class="wrap home-grid">
+    <div class="home-visual" data-reveal>
+      <figure class="ph home-img tilt"><img src="https://images.unsplash.com/photo-1615461066159-fea0960485d5?auto=format&fit=crop&w=1000&q=70" alt="Healthcare worker in gloves drawing blood from a patient's arm" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+      <div class="home-chip hc1"><span class="fc-ico fc-ok"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span><span><small>Sealed single-use kit</small><b>Opened in front of you</b></span></div>
+      <div class="home-chip hc2"><span class="live-dot"></span><span><small>Next free slot</small><b>Tomorrow · 6:30 AM</b></span></div>
+    </div>
+    <div class="home-copy" data-reveal>
+      <span class="kicker">Home sample collection</span>
+      <h2>We come to you — <span class="grad">free, from 6:30 AM</span></h2>
+      <p>Skip the queue and the travel. A trained phlebotomist arrives at your door in uniform, collects your sample in under ten minutes and gets it to our lab in a temperature-controlled box.</p>
+      <ul class="ticks">
+        <li>Free on orders above ₹499</li>
+        <li>Live tracking of your phlebotomist</li>
+        <li>Ideal for elderly parents and children</li>
+        <li>Fasting tests collected before breakfast</li>
+      </ul>
+      <form class="pin-form" id="pinForm" autocomplete="off">
+        <label for="pinInput">Check your pincode</label>
+        <div class="pin-row">
+          <input id="pinInput" inputmode="numeric" maxlength="6" placeholder="e.g. 636008">
+          <button type="submit" class="btn btn-primary">Check</button>
+        </div>
+        <p class="pin-msg" id="pinMsg" role="status"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. PATHOLOGISTS — 3D flip cards ============ -->
+<section class="section team" id="team">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Our pathologists</span>
+      <h2>The specialists <span class="grad">behind every report</span></h2>
+      <p>Tap or hover a card to meet them.</p>
+    </div>
+    <div class="team-grid">
+      <article class="flip" tabindex="0" data-reveal>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <figure class="ph"><img src="https://images.unsplash.com/photo-1659353888906-adb3e0041693?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Meera Iyer in a white coat" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+            <div class="flip-name"><b>Dr. Meera Iyer</b><span>MD Pathology · Lab director</span></div>
+          </div>
+          <div class="flip-face flip-back">
+            <span class="flip-yrs">18 yrs</span>
+            <b>Dr. Meera Iyer</b>
+            <p>Leads quality for the whole network and reviews every critical haematology result.</p>
+            <ul><li>Haematopathology</li><li>Quality systems</li></ul>
+          </div>
+        </div>
+      </article>
+      <article class="flip" tabindex="0" data-reveal>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <figure class="ph"><img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Arjun Rao" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+            <div class="flip-name"><b>Dr. Arjun Rao</b><span>MD Biochemistry</span></div>
+          </div>
+          <div class="flip-face flip-back">
+            <span class="flip-yrs">12 yrs</span>
+            <b>Dr. Arjun Rao</b>
+            <p>Runs our clinical chemistry section and the diabetes and thyroid clinics.</p>
+            <ul><li>Endocrine testing</li><li>Lipid disorders</li></ul>
+          </div>
+        </div>
+      </article>
+      <article class="flip" tabindex="0" data-reveal>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <figure class="ph"><img src="https://images.unsplash.com/photo-1673865641073-4479f93a7776?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Kavya Nair in a lab coat" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+            <div class="flip-name"><b>Dr. Kavya Nair</b><span>MD Microbiology</span></div>
+          </div>
+          <div class="flip-face flip-back">
+            <span class="flip-yrs">10 yrs</span>
+            <b>Dr. Kavya Nair</b>
+            <p>Oversees cultures and infection panels, and advises doctors on the right antibiotic.</p>
+            <ul><li>Blood &amp; urine culture</li><li>Antibiotic sensitivity</li></ul>
+          </div>
+        </div>
+      </article>
+      <article class="flip" tabindex="0" data-reveal>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <figure class="ph"><img src="https://images.unsplash.com/photo-1712215544003-af10130f8eb3?auto=format&fit=crop&w=700&q=70" alt="Portrait of Dr. Vikram Shah in a lab coat" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+            <div class="flip-name"><b>Dr. Vikram Shah</b><span>MD Pathology · Histopathology</span></div>
+          </div>
+          <div class="flip-face flip-back">
+            <span class="flip-yrs">15 yrs</span>
+            <b>Dr. Vikram Shah</b>
+            <p>Reports biopsies and cytology, with a second review on every cancer diagnosis.</p>
+            <ul><li>Histopathology</li><li>Cytology</li></ul>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. TESTIMONIALS — swipeable slider ============ -->
+<section class="section voices" id="voices">
+  <div class="wrap">
+    <div class="sec-head" data-reveal>
+      <span class="kicker">Patient stories</span>
+      <h2>What our patients <span class="grad">tell their friends</span></h2>
+    </div>
+    <div class="slider" id="slider" data-reveal>
+      <div class="slides" id="slides">
+        <figure class="quote">
+          <div class="stars">★★★★★</div>
+          <blockquote>“The phlebotomist came at 6:45 AM, before my father's breakfast. The thyroid report was on my phone by lunch.”</blockquote>
+          <figcaption><span class="q-av ph"><img src="https://images.unsplash.com/photo-1757744705465-ea08b0ddc38a?auto=format&fit=crop&w=160&h=160&q=70" alt="" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span><span><b>Karthik M.</b><em>Fairlands, Salem</em></span></figcaption>
+        </figure>
+        <figure class="quote">
+          <div class="stars">★★★★★</div>
+          <blockquote>“They called my doctor within minutes when my potassium came back high. That call genuinely mattered.”</blockquote>
+          <figcaption><span class="q-av ph"><img src="https://images.unsplash.com/photo-1749700332031-cf99864959ea?auto=format&fit=crop&w=160&h=160&q=70" alt="" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span><span><b>Lakshmi V.</b><em>Hasthampatti</em></span></figcaption>
+        </figure>
+        <figure class="quote">
+          <div class="stars">★★★★★</div>
+          <blockquote>“Clear prices, no surprise add-ons, and the report shows last year's values next to this year's. Very easy to follow.”</blockquote>
+          <figcaption><span class="q-av ph"><img src="https://images.unsplash.com/photo-1774437678715-fb40846dc252?auto=format&fit=crop&w=160&h=160&q=70" alt="" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span><span><b>Ramesh S.</b><em>Attur</em></span></figcaption>
+        </figure>
+        <figure class="quote">
+          <div class="stars">★★★★★</div>
+          <blockquote>“We booked the family package for all four of us. One visit, four sample sets, one easy dashboard for every report.”</blockquote>
+          <figcaption><span class="q-av ph"><img src="https://images.unsplash.com/photo-1759840278276-fe8d58873dc3?auto=format&fit=crop&w=160&h=160&q=70" alt="" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></span><span><b>Priya N.</b><em>Salem town</em></span></figcaption>
+        </figure>
+      </div>
+      <div class="slider-ctrl">
+        <button class="sl-btn" id="slPrev" aria-label="Previous story"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="sl-dots" id="slDots"></div>
+        <button class="sl-btn" id="slNext" aria-label="Next story"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. FAQ — accordion ============ -->
+<section class="section faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="faq-copy" data-reveal>
+      <span class="kicker">FAQ</span>
+      <h2>Before your test, <span class="grad">answered</span></h2>
+      <p>Still unsure? Our care team answers calls and WhatsApp messages from 6:30 AM to 9 PM.</p>
+      <a href="contact.html" class="btn btn-ghost">Talk to our care team</a>
+    </div>
+    <div class="acc" data-reveal>
+      <div class="acc-item is-open">
+        <button class="acc-q" aria-expanded="true">Do I need to fast before my blood test?<i></i></button>
+        <div class="acc-a"><div><p>Only for some tests. Sugar and lipid tests need 8–12 hours of fasting — water is fine. Thyroid, vitamin and most other tests do not. Each test page and your booking SMS say exactly what to do.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">How will I receive my report?<i></i></button>
+        <div class="acc-a"><div><p>By SMS and email as a secure PDF, and in your account where you can compare results over time. Printed copies are free at any of our centres.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">Is home collection really free?<i></i></button>
+        <div class="acc-a"><div><p>Yes, for orders above ₹499 within our service pincodes. Below that there is a flat ₹99 visit charge.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">Do you accept insurance or corporate cards?<i></i></button>
+        <div class="acc-a"><div><p>We work with major TPAs for cashless tests and issue GST invoices for reimbursement. Corporate wellness tie-ups are available on request.</p></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-q" aria-expanded="false">What if a result looks abnormal?<i></i></button>
+        <div class="acc-a"><div><p>Our pathologist reviews it first. Critical values are phoned to you and your doctor right away, and you get a free consultation to explain what the numbers mean.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12. HEALTH BLOG — latest articles ============ -->
+<section class="section insights" id="insights">
+  <div class="wrap">
+    <div class="sec-head sec-head--row" data-reveal>
+      <div>
+        <span class="kicker">Health library</span>
+        <h2>Understand your <span class="grad">results better</span></h2>
+      </div>
+      <a href="404.html" class="text-link">All articles <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="post-grid">
+      <a href="404.html" class="post tilt" data-reveal>
+        <figure class="ph"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=70" alt="Bowl of fresh vegetable salad" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="post-body"><span class="post-meta">Diabetes · 5 min read</span><h3>HbA1c vs fasting sugar: which number should you watch?</h3><span class="post-more">Read article →</span></div>
+      </a>
+      <a href="404.html" class="post tilt" data-reveal>
+        <figure class="ph"><img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=70" alt="Woman meditating on a wooden floor" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="post-body"><span class="post-meta">Thyroid · 4 min read</span><h3>Tired all the time? Five signs it may be your thyroid</h3><span class="post-more">Read article →</span></div>
+      </a>
+      <a href="404.html" class="post tilt" data-reveal>
+        <figure class="ph"><img src="https://images.unsplash.com/photo-1607962837359-5e7e89f86776?auto=format&fit=crop&w=800&q=70" alt="Man running on a road in daylight" loading="lazy" onerror="this.parentNode.classList.add('is-broken')"></figure>
+        <div class="post-body"><span class="post-meta">Heart · 6 min read</span><h3>Reading your lipid profile: LDL, HDL and what to do next</h3><span class="post-more">Read article →</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-glow" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="footer-cta" data-reveal>
+      <div>
+        <h3>Book your test today — reports by this evening.</h3>
+        <p>Free home collection across Salem from 6:30 AM.</p>
+      </div>
+      <a href="contact.html" class="btn btn-primary">Talk to our team
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="logo" aria-label="Home">
+          <img src="../assets/Logo.webp" alt="Company logo">
+        </a>
+        <p>Accurate diagnostics, free home collection and reports you can understand — for every family in Salem.</p>
+        <div class="footer-social">
+          <a href="404.html" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="404.html" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 21v-7h2.5l.5-3H14V9.2c0-.9.3-1.7 1.7-1.7H17V5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.2V11H8v3h2.6v7"/></svg></a>
+          <a href="404.html" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="4" height="10"/><circle cx="5" cy="5" r="1.6"/><path d="M11 19v-6.5a2.5 2.5 0 0 1 5 0V19M11 12.5V19"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="#hero">Home</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="404.html">Blood tests</a>
+        <a href="404.html">Health packages</a>
+        <a href="404.html">Home sample collection</a>
+        <a href="404.html">Histopathology</a>
+        <a href="404.html">Corporate wellness</a>
+      </div>
+      <div class="footer-col">
+        <h4>Get In Touch</h4>
+        <ul class="footer-contact">
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+            <a href="404.html">MMR Complex, Periyakollappatty,<br>Chinna Thirupathi, Salem, Tamil<br>Nadu 636008</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <a href="404.html">0712 371 2345</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <a href="404.html">hello@stackly.com</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 STACKLY SOLUTIONS</span>
+      <span class="status-dot"><span class="live-dot"></span>Lab open · reports going out now</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Back to top — the ring fills as you scroll -->
+<button class="to-top" id="toTop" aria-label="Back to top">
+  <svg class="tt-ring" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><circle class="tt-fill" id="ttFill" cx="24" cy="24" r="21"/></svg>
+  <svg class="tt-arrow" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+(function () {
+  'use strict';
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HAS_GSAP = !!(window.gsap && window.ScrollTrigger);
+  var ANIM = HAS_GSAP && !REDUCED;
+  var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  if (ANIM) { gsap.registerPlugin(ScrollTrigger); ScrollTrigger.clearScrollMemory('manual'); }
+
+  /* ---------- Preloader: the tube fills, then the page reveals ---------- */
+  var pre = $('#preloader'), pct = $('#plPct'), liquid = $('#plLiquid'), p = 0, done = false, finished = false;
+  var tick = setInterval(function () {
+    p = Math.min(p + Math.random() * 18, done ? 100 : 92);
+    pct.textContent = Math.round(p) + '%';
+    liquid.style.height = p + '%';
+    if (p >= 100) finishLoad();
+  }, 110);
+  function finishLoad() {
+    if (finished) return;
+    finished = true;
+    clearInterval(tick);
+    pct.textContent = '100%'; liquid.style.height = '100%';
+    pre.classList.add('is-done');
+    document.body.classList.remove('is-loading');
+    setTimeout(function () { pre.style.display = 'none'; }, 700);
+    heroIntro();
+  }
+  window.addEventListener('load', function () { done = true; });
+  setTimeout(function () { done = true; }, 1400);
+  setTimeout(finishLoad, 3200);
+
+  /* ---------- Header: transparent over the hero, solid after 40px; the logo gets its plate ---------- */
+  var header = $('#siteHeader'), bar = $('#scrollBar');
+  var toTop = $('#toTop'), ttFill = $('#ttFill'), ringLen = 2 * Math.PI * 21;
+  ttFill.style.strokeDasharray = ringLen;
+  var wasSolid = false;
+  function onScroll() {
+    var y = window.scrollY, max = document.documentElement.scrollHeight - innerHeight;
+    var prog = max > 0 ? y / max : 0;
+    var solid = y > 40;
+    if (solid !== wasSolid) {
+      header.classList.toggle('is-solid', solid);
+      wasSolid = solid;
+      if (ANIM) gsap.fromTo('.site-header .logo', { scale: .9, rotateX: solid ? -60 : 60 }, { scale: 1, rotateX: 0, duration: .6, ease: 'back.out(2)', clearProps: 'transform' });
+    }
+    bar.style.transform = 'scaleX(' + prog + ')';
+    ttFill.style.strokeDashoffset = ringLen * (1 - prog);
+    toTop.classList.toggle('is-on', y > 600);
+  }
+  toTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
+
+  /* ---------- Nav underline follows hover, rests on the active link ---------- */
+  var navLinks = $('#navLinks'), navLine = $('#navLine');
+  function moveLine(a) {
+    if (!a) return;
+    navLine.style.width = a.offsetWidth + 'px';
+    navLine.style.transform = 'translateX(' + a.offsetLeft + 'px)';
+  }
+  $$('a', navLinks).forEach(function (a) { a.addEventListener('mouseenter', function () { moveLine(a); }); });
+  navLinks.addEventListener('mouseleave', function () { moveLine($('a.active', navLinks)); });
+  window.addEventListener('load', function () { moveLine($('a.active', navLinks)); });
+  window.addEventListener('resize', function () { moveLine($('a.active', navLinks)); });
+  moveLine($('a.active', navLinks));
+
+  /* ---------- Mobile menu (slides in from the right) ---------- */
+  var menu = $('#mobileMenu'), scrim = $('#menuScrim'), burger = $('#hamburger');
+  function openMenu() {
+    menu.classList.add('is-open'); scrim.classList.add('is-on');
+    document.body.classList.add('menu-open');
+    burger.classList.add('is-open'); burger.setAttribute('aria-expanded', 'true'); burger.setAttribute('aria-label', 'Close menu');
+    menu.setAttribute('aria-hidden', 'false');
+    if (ANIM) gsap.from('.mm-links a', { x: 40, opacity: 0, duration: .45, stagger: .05, delay: .12, ease: 'power3.out', clearProps: 'transform,opacity' });
+  }
+  function closeMenu() {
+    menu.classList.remove('is-open'); scrim.classList.remove('is-on');
+    document.body.classList.remove('menu-open');
+    burger.classList.remove('is-open'); burger.setAttribute('aria-expanded', 'false'); burger.setAttribute('aria-label', 'Open menu');
+    menu.setAttribute('aria-hidden', 'true');
+  }
+  burger.addEventListener('click', function () { menu.classList.contains('is-open') ? closeMenu() : openMenu(); });
+  $('#mobileMenuClose').addEventListener('click', closeMenu);
+  scrim.addEventListener('click', closeMenu);
+  $$('a', menu).forEach(function (a) { a.addEventListener('click', closeMenu); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', function () { if (innerWidth > 1024) closeMenu(); });
+
+  /* ---------- Smooth in-page anchors (offset for the header) ---------- */
+  $$('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var id = a.getAttribute('href');
+      var t = id.length > 1 && document.querySelector(id);
+      if (!t) return;
+      e.preventDefault();
+      window.scrollTo({ top: t.getBoundingClientRect().top + scrollY - 70, behavior: REDUCED ? 'auto' : 'smooth' });
+    });
+  });
+
+  /* ---------- Counters ---------- */
+  function countUp(el) {
+    var target = parseFloat(el.dataset.count), dec = parseInt(el.dataset.decimals || 0, 10);
+    if (REDUCED) { el.textContent = target.toFixed(dec); return; }
+    var start = null, dur = 1600;
+    function step(ts) {
+      if (!start) start = ts;
+      var k = Math.min(1, (ts - start) / dur), e = 1 - Math.pow(1 - k, 4);
+      el.textContent = dec ? (target * e).toFixed(dec) : Math.round(target * e).toLocaleString('en-IN');
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function ringFill(c) {
+    var len = 2 * Math.PI * 34, pctv = parseFloat(c.dataset.pct);
+    c.style.strokeDasharray = len;
+    c.style.strokeDashoffset = len * (1 - pctv / 100);
+  }
+  // counters + rings start when they scroll into view (works with or without GSAP)
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        $$('[data-count]', en.target).forEach(function (c) { if (!c.dataset.done) { c.dataset.done = 1; countUp(c); } });
+        $$('.sr-fg', en.target).forEach(ringFill);
+        io.unobserve(en.target);
+      });
+    }, { threshold: 0.3 });
+    $$('.stats .stat').forEach(function (el) { io.observe(el); });
+  } else {
+    $$('.sr-fg').forEach(ringFill);
+  }
+  $$('.sr-fg').forEach(function (c) { var len = 2 * Math.PI * 34; c.style.strokeDasharray = len; c.style.strokeDashoffset = REDUCED ? len * (1 - parseFloat(c.dataset.pct) / 100) : len; });
+
+  /* ---------- Hero: build the two DNA helices ---------- */
+  function buildHelix(el, rungs) {
+    var html = '';
+    for (var i = 0; i < rungs; i++) {
+      html += '<span class="rung" style="--i:' + i + ';--ry:' + (i * 24) + 'deg"><i class="base a"></i><i class="bond"></i><i class="base b"></i></span>';
+    }
+    el.innerHTML = html;
+  }
+  buildHelix($('#helixL'), 16);
+  buildHelix($('#helixR'), 16);
+
+  /* ---------- Hero: rotating words ---------- */
+  var words = $$('.rot-word'), wi = 0, rotator = $('#rotator');
+  if (!REDUCED) {
+    setInterval(function () {
+      var old = words[wi];
+      old.classList.remove('is-on'); old.classList.add('is-out');
+      setTimeout(function () { old.classList.remove('is-out'); }, 700);
+      wi = (wi + 1) % words.length;
+      words[wi].classList.add('is-on');
+    }, 2600);
+  }
+
+  /* ---------- Hero: intro motion + mouse parallax in 3D ---------- */
+  function heroIntro() {
+    $$('.hero-stats [data-count]').forEach(countUp);
+    if (!ANIM) return;
+    var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+    tl.from('.eyebrow', { y: 20, opacity: 0, duration: .6 })
+      .from('.ht-word', { yPercent: 110, rotateX: -80, opacity: 0, duration: .9, stagger: .1, transformOrigin: '50% 100%' }, '-=.3')
+      .from('.rotator', { rotateX: -90, opacity: 0, duration: .9, transformOrigin: '50% 0%' }, '-=.6')
+      .from('.hero-sub', { y: 20, opacity: 0, duration: .6 }, '-=.5')
+      .from('.hero-search', { y: 24, scale: .96, opacity: 0, duration: .6 }, '-=.4')
+      .from('.hero-chips, .hero-actions', { y: 16, opacity: 0, duration: .5, stagger: .08 }, '-=.35')
+      .from('.hero-stats li', { y: 26, rotateX: -50, opacity: 0, duration: .6, stagger: .08 }, '-=.3')
+      .from('.helix', { opacity: 0, scale: .6, duration: 1.4, stagger: .15, ease: 'power2.out' }, 0.1)
+      .from('.float-card, .float-tube, .float-cell', { opacity: 0, z: -300, scale: .5, duration: 1.1, stagger: .08, ease: 'back.out(1.6)', clearProps: 'opacity,scale' }, .5);
+    tl.eventCallback('onComplete', bobFloaters);
+  }
+  function bobFloaters() {
+    $$('.float-card, .float-tube, .float-cell').forEach(function (el, i) {
+      gsap.to(el, { y: (i % 2 ? 14 : -14), rotation: (i % 2 ? 3 : -3), duration: 3 + i * .4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+    });
+  }
+  var stage = $('#heroStage'), heroCopy = $('#heroCopy'), hero = $('#hero');
+  if (ANIM && FINE) {
+    var layers = $$('[data-depth]', stage).map(function (el) {
+      return { d: parseFloat(el.dataset.depth), x: gsap.quickTo(el, 'xPercent', { duration: .9, ease: 'power3' }), y: gsap.quickTo(el, 'yPercent', { duration: .9, ease: 'power3' }) };
+    });
+    var rx = gsap.quickTo(heroCopy, 'rotationX', { duration: 1, ease: 'power3' });
+    var ry = gsap.quickTo(heroCopy, 'rotationY', { duration: 1, ease: 'power3' });
+    hero.addEventListener('mousemove', function (e) {
+      var r = hero.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      layers.forEach(function (l) { l.x(-x * l.d * 12); l.y(-y * l.d * 12); });
+      rx(-y * 6); ry(x * 8);
+    });
+    hero.addEventListener('mouseleave', function () { layers.forEach(function (l) { l.x(0); l.y(0); }); rx(0); ry(0); });
+  }
+  if (ANIM) {
+    // the hero sinks back in 3D as you scroll past it
+    gsap.to(heroCopy, { scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true }, z: -160, rotationX: 14, opacity: .2, ease: 'none' });
+    gsap.to(stage, { scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true }, yPercent: 18, ease: 'none' });
+  }
+
+  /* ---------- Hero: report countdown ticks ---------- */
+  var mins = 342;
+  setInterval(function () { mins = mins > 60 ? mins - 1 : 342; $('#fcTime').textContent = Math.floor(mins / 60) + ' h ' + (mins % 60) + ' m'; }, 4000);
+
+  /* ---------- Hero: test search ---------- */
+  var TESTS = ['Complete blood count (CBC)', 'Thyroid profile', 'HbA1c', 'Fasting blood sugar', 'Lipid profile', 'Liver function test', 'Kidney function test', 'Vitamin D', 'Vitamin B12', 'Iron studies', 'Dengue NS1', 'Typhoid (Widal)', 'Urine routine', 'Full body checkup'];
+  var heroMsg = $('#heroMsg'), heroInput = $('#heroSearchInput');
+  function findTest(q) {
+    q = q.trim().toLowerCase();
+    if (!q) { heroMsg.textContent = 'Type a test name to search.'; heroMsg.className = 'hero-msg show'; heroInput.focus(); return; }
+    var hits = TESTS.filter(function (t) { return t.toLowerCase().indexOf(q) !== -1; });
+    heroMsg.className = 'hero-msg show ' + (hits.length ? 'ok' : 'no');
+    heroMsg.textContent = hits.length ? 'Available: ' + hits.slice(0, 3).join(' · ') + ' — book with free home collection.' : 'We could not find “' + q + '”. Call 0712 371 2345 and we will help.';
+    if (ANIM) gsap.fromTo(heroMsg, { y: -8, opacity: 0 }, { y: 0, opacity: 1, duration: .4 });
+  }
+  $('#heroSearch').addEventListener('submit', function (e) { e.preventDefault(); findTest(heroInput.value); });
+  $$('.hchip').forEach(function (c) { c.addEventListener('click', function () { heroInput.value = c.dataset.q; findTest(c.dataset.q); }); });
+
+  /* ---------- Scroll reveals in 3D (GSAP); without GSAP everything is simply visible ---------- */
+  if (ANIM) {
+    $$('[data-reveal]').forEach(function (el) {
+      gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 88%', once: true }, y: 46, rotationX: function () { return el.offsetHeight > 500 ? 6 : 14; }, opacity: 0, transformPerspective: 1200, transformOrigin: '50% 0%', duration: .9, ease: 'power3.out', clearProps: 'transform,opacity' });
+    });
+    ScrollTrigger.batch('.test-card', {
+      start: 'top 90%', once: true,
+      onEnter: function (b) { gsap.from(b, { y: 70, rotationY: -25, rotationX: 10, opacity: 0, transformPerspective: 1000, duration: .9, stagger: .1, ease: 'power3.out', clearProps: 'transform,opacity' }); }
+    });
+    ScrollTrigger.batch('.step', {
+      start: 'top 88%', once: true,
+      onEnter: function (b) {
+        gsap.from(b, { y: 40, opacity: 0, duration: .7, stagger: .12, ease: 'power3.out', clearProps: 'transform,opacity' });
+        gsap.from(b.map(function (s) { return s.querySelector('.step-ico'); }), { rotationY: 180, scale: .6, duration: .9, stagger: .12, ease: 'back.out(1.8)', clearProps: 'transform' });
+      }
+    });
+    gsap.fromTo('#stepsFill', { scaleX: 0, scaleY: 0 }, { scaleX: 1, scaleY: 1, ease: 'none', scrollTrigger: { trigger: '.steps', start: 'top 75%', end: 'bottom 55%', scrub: true } });
+    ScrollTrigger.batch('.flip', {
+      start: 'top 88%', once: true,
+      onEnter: function (b) { gsap.from(b.map(function (f) { return f.querySelector('.flip-inner'); }), { rotationY: -100, opacity: 0, duration: 1.1, stagger: .12, ease: 'power3.out', clearProps: 'transform,opacity' }); }
+    });
+    // parallax on images inside their frames
+    $$('.home-img img, .post .ph img').forEach(function (img) {
+      gsap.fromTo(img, { yPercent: -6, scale: 1.12 }, { yPercent: 6, scale: 1.12, ease: 'none', scrollTrigger: { trigger: img.parentNode, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+    gsap.from('.home-chip', { scrollTrigger: { trigger: '.home-visual', start: 'top 75%', once: true }, z: -200, scale: .6, opacity: 0, duration: .9, stagger: .15, ease: 'back.out(1.8)', clearProps: 'transform,opacity' });
+    gsap.to('.stats-bg', { backgroundPosition: '0 120px', ease: 'none', scrollTrigger: { trigger: '.stats', start: 'top bottom', end: 'bottom top', scrub: true } });
+  } else {
+    $('#stepsFill').style.transform = 'none';
+  }
+
+  /* ---------- 3D tilt on cards with images (mouse only) ---------- */
+  if (FINE && !REDUCED) {
+    $$('.tilt').forEach(function (card) {
+      var img = card.querySelector('img');
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        card.style.transform = 'perspective(900px) rotateY(' + (x * 12) + 'deg) rotateX(' + (-y * 10) + 'deg) translateZ(6px)';
+        card.style.setProperty('--gx', (x + .5) * 100 + '%');
+        card.style.setProperty('--gy', (y + .5) * 100 + '%');
+        if (img && !card.classList.contains('home-img') && !card.classList.contains('post')) img.style.transform = 'scale(1.08) translate(' + (-x * 10) + 'px,' + (-y * 10) + 'px)';
+      });
+      card.addEventListener('mouseleave', function () {
+        card.style.transform = '';
+        if (img && !card.classList.contains('home-img') && !card.classList.contains('post')) img.style.transform = '';
+      });
+    });
+  }
+
+  /* ---------- Test filter ---------- */
+  var ftabs = $$('.ftab'), cards = $$('.test-card');
+  ftabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      ftabs.forEach(function (x) { x.classList.remove('is-on'); x.setAttribute('aria-selected', 'false'); });
+      t.classList.add('is-on'); t.setAttribute('aria-selected', 'true');
+      var cat = t.dataset.cat;
+      var show = cards.filter(function (c) { return cat === 'all' || c.dataset.cat === cat; });
+      cards.forEach(function (c) { c.hidden = show.indexOf(c) === -1; });
+      if (ANIM) gsap.fromTo(show, { rotationY: -40, opacity: 0, y: 20, transformPerspective: 900 }, { rotationY: 0, opacity: 1, y: 0, duration: .6, stagger: .06, ease: 'power3.out', clearProps: 'transform,opacity' });
+    });
+  });
+
+  /* ---------- Lab: the step in the middle of the screen picks the image ---------- */
+  var labSteps = $$('.lab-step'), labImgs = $$('.lab-img'), labDots = $$('.lab-dots i'), current = 0;
+  var labLabels = ['Analysers online', 'QC passed · 06:50', 'Pathologist reviewing'];
+  function setLab(n) {
+    if (n === current) return;
+    current = n;
+    labSteps.forEach(function (s, i) { s.classList.toggle('is-active', i === n); });
+    labImgs.forEach(function (s, i) { s.classList.toggle('is-active', i === n); });
+    labDots.forEach(function (s, i) { s.classList.toggle('on', i === n); });
+    $('#labLabel').textContent = labLabels[n];
+  }
+  if ('IntersectionObserver' in window) {
+    var so = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) setLab(+en.target.dataset.step); });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    labSteps.forEach(function (s) { so.observe(s); });
+  }
+  labSteps.forEach(function (s) { s.addEventListener('click', function () { setLab(+s.dataset.step); }); });
+
+  /* ---------- Packages: one person / family of four ---------- */
+  var pkSwitch = $('#pkSwitch'), family = false;
+  function setWho(f) {
+    family = f;
+    pkSwitch.classList.toggle('on', f);
+    pkSwitch.setAttribute('aria-checked', String(f));
+    $$('.pk-label').forEach(function (l) { l.classList.toggle('is-on', (l.dataset.who === 'family') === f); });
+    $$('.pk-price b, .pk-per').forEach(function (b) { b.textContent = f ? b.dataset.family : b.dataset.one; });
+    if (ANIM) gsap.fromTo('.pk-price b', { rotationX: -90, opacity: 0 }, { rotationX: 0, opacity: 1, duration: .5, stagger: .06, ease: 'back.out(2)', clearProps: 'transform,opacity' });
+  }
+  pkSwitch.addEventListener('click', function () { setWho(!family); });
+  $$('.pk-label').forEach(function (l) { l.addEventListener('click', function () { setWho(l.dataset.who === 'family'); }); });
+
+  /* ---------- Home collection: pincode check ---------- */
+  var pinInput = $('#pinInput'), pinMsg = $('#pinMsg');
+  pinInput.addEventListener('input', function () { pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 6); });
+  $('#pinForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = pinInput.value;
+    if (!/^\d{6}$/.test(v)) { pinMsg.className = 'pin-msg no'; pinMsg.textContent = 'Please enter a 6-digit pincode.'; }
+    else if (/^63(6|7)/.test(v)) { pinMsg.className = 'pin-msg ok'; pinMsg.textContent = 'Great news — free home collection is available at ' + v + '. Earliest slot: tomorrow 6:30 AM.'; }
+    else { pinMsg.className = 'pin-msg no'; pinMsg.textContent = 'We don’t collect at ' + v + ' yet. Visit any centre or call 0712 371 2345.'; }
+    if (ANIM) gsap.fromTo(pinMsg, { y: -8, opacity: 0 }, { y: 0, opacity: 1, duration: .4 });
+  });
+
+  /* ---------- Team: tap to flip on touch screens ---------- */
+  $$('.flip').forEach(function (f) {
+    f.addEventListener('click', function () { if (!FINE) f.classList.toggle('is-flipped'); });
+    f.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); f.classList.toggle('is-flipped'); } });
+  });
+
+  /* ---------- Testimonials slider: buttons, dots, swipe, autoplay ---------- */
+  var slides = $('#slides'), quotes = $$('.quote', slides), dotsBox = $('#slDots'), si = 0, auto;
+  function perView() { return innerWidth > 1024 ? 2 : 1; }
+  function pages() { return quotes.length - perView() + 1; }
+  function buildDots() {
+    dotsBox.innerHTML = '';
+    for (var i = 0; i < pages(); i++) {
+      var d = document.createElement('button');
+      d.setAttribute('aria-label', 'Go to story ' + (i + 1));
+      (function (n) { d.addEventListener('click', function () { go(n); restart(); }); })(i);
+      dotsBox.appendChild(d);
+    }
+  }
+  function go(n) {
+    si = (n + pages()) % pages();
+    var w = quotes[0].offsetWidth + parseFloat(getComputedStyle(slides).columnGap || 0);
+    slides.style.transform = 'translateX(' + (-si * w) + 'px)';
+    $$('button', dotsBox).forEach(function (d, i) { d.classList.toggle('on', i === si); });
+  }
+  function restart() { clearInterval(auto); if (!REDUCED) auto = setInterval(function () { go(si + 1); }, 5000); }
+  $('#slPrev').addEventListener('click', function () { go(si - 1); restart(); });
+  $('#slNext').addEventListener('click', function () { go(si + 1); restart(); });
+  var sx = null;
+  slides.addEventListener('pointerdown', function (e) { sx = e.clientX; });
+  slides.addEventListener('pointerup', function (e) {
+    if (sx === null) return;
+    var dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) > 40) { go(si + (dx < 0 ? 1 : -1)); restart(); }
+  });
+  $('#slider').addEventListener('mouseenter', function () { clearInterval(auto); });
+  $('#slider').addEventListener('mouseleave', restart);
+  buildDots(); go(0); restart();
+  window.addEventListener('resize', function () { buildDots(); go(Math.min(si, pages() - 1)); });
+
+  /* ---------- FAQ accordion (one open at a time) ---------- */
+  $$('.acc-item').forEach(function (item) {
+    $('.acc-q', item).addEventListener('click', function () {
+      var open = item.classList.contains('is-open');
+      $$('.acc-item').forEach(function (x) { x.classList.remove('is-open'); $('.acc-q', x).setAttribute('aria-expanded', 'false'); });
+      if (!open) { item.classList.add('is-open'); $('.acc-q', item).setAttribute('aria-expanded', 'true'); }
+    });
+  });
+
+  /* ---------- Scroll loop ---------- */
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { onScroll(); ticking = false; });
+  }, { passive: true });
+  window.addEventListener('load', function () { if (ANIM) ScrollTrigger.refresh(); });
+  onScroll();
+})();
+</script>
+</body>
+</html>
