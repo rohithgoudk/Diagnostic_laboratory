@@ -31,7 +31,14 @@
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { max-width: 100%; overflow-x: hidden; }
+  html, body { max-width: 100%; }
+  /* clip sideways overflow without turning <body> into its own scroll box —
+     "overflow-x: hidden" on both html and body was what stopped the sticky top bar from sticking */
+  html { overflow-x: hidden; }
+  body { overflow-x: clip; }
+  /* while a menu or the preloader is open, lock the page itself (locking only <body> doesn't stop the page scrolling) */
+  html:has(body.nav-open), html:has(body.menu-open), html:has(body.is-loading) { overflow: hidden; }
+  
   html { -webkit-text-size-adjust: 100%; }
   body {
     min-height: 100vh;

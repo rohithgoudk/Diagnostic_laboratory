@@ -200,7 +200,7 @@
         <h2>How can we help?</h2>
       </div>
       <div class="cf-row">
-        <label class="cf-field"><span>Full name <i>*</i></span><input id="cfName" autocomplete="name" placeholder="Your name"><em class="cf-err"></em></label>
+        <label class="cf-field"><span>Full name <i>*</i></span><input id="cfName" type="text" inputmode="text" autocomplete="name" maxlength="40" pattern="[A-Za-z ]+" placeholder="Your name (letters only)"><em class="cf-err"></em></label>
         <label class="cf-field"><span>Mobile number <i>*</i></span><input id="cfPhone" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile"><em class="cf-err"></em></label>
       </div>
       <div class="cf-row">
@@ -230,14 +230,6 @@
       <label class="cf-consent"><input type="checkbox" id="cfConsent"><span>I agree that STACKLY may contact me about this request.</span></label>
       <em class="cf-err cf-consent-err" id="cfConsentErr"></em>
       <button type="submit" class="btn btn-primary btn-lg btn-block">Send message <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-
-      <div class="cf-done" id="cfDone" hidden>
-        <span class="cf-check"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></span>
-        <h3>Message received</h3>
-        <p id="cfDoneText">We'll get back to you shortly.</p>
-        <span class="cf-ticket" id="cfTicket"></span>
-        <button type="button" class="btn btn-ghost" id="cfAgain">Send another message</button>
-      </div>
     </form>
 
     <aside class="lines" data-reveal>
@@ -628,6 +620,16 @@
     f.classList.toggle('has-err', !!text);
     f.querySelector('.cf-err').textContent = text || '';
   }
+  // full name: letters and single spaces only — digits and symbols are removed as you type
+  $('#cfName').addEventListener('input', function (e) {
+    var el = e.target, v = el.value, clean = v.replace(/[^A-Za-z ]/g, '').replace(/^ +/, '').replace(/ {2,}/g, ' ');
+    if (clean !== v) {
+      var pos = Math.max(0, (el.selectionStart || clean.length) - (v.length - clean.length));
+      el.value = clean;
+      try { el.setSelectionRange(pos, pos); } catch (err) {}
+      if (/[^A-Za-z ]/.test(v)) setTimeout(function () { setErr(el, 'Letters only \u2014 numbers and symbols are not allowed.'); }, 0);
+    }
+  });
   ['cfName', 'cfPhone', 'cfEmail', 'cfTopic', 'cfMsg'].forEach(function (id) {
     var el = $('#' + id);
     el.addEventListener('input', function () { setErr(el, ''); });
@@ -638,9 +640,11 @@
     e.preventDefault();
     var name = $('#cfName'), phone = $('#cfPhone'), email = $('#cfEmail'), topic = $('#cfTopic');
     var ok = true;
-    if (name.value.trim().length < 2) { setErr(name, 'Please enter your name.'); ok = false; }
+    var nm = name.value.trim();
+    if (!nm) { setErr(name, 'Please enter your name.'); ok = false; }
+    else if (!/^[A-Za-z]+( [A-Za-z]+)*$/.test(nm) || nm.replace(/ /g, '').length < 2) { setErr(name, 'Use letters only (at least 2), no numbers.'); ok = false; }
     if (!/^[6-9]\d{9}$/.test(phone.value)) { setErr(phone, 'Enter a valid 10-digit mobile number.'); ok = false; }
-    if (email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) { setErr(email, 'That email doesn\'t look right.'); ok = false; }
+    if (email.value.trim() && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.com$/i.test(email.value.trim())) { setErr(email, 'Enter the full email ending in ".com", e.g. you@example.com.'); ok = false; }
     var reply = (form.querySelector('input[name=reply]:checked') || {}).value || 'Phone call';
     if (reply === 'Email' && !email.value.trim()) { setErr(email, 'Add your email so we can reply by email.'); ok = false; }
     if (!topic.value) { setErr(topic, 'Choose a topic.'); ok = false; }
@@ -652,16 +656,8 @@
       if (ANIM) gsap.fromTo(form, { x: -8 }, { x: 0, duration: .5, ease: 'elastic.out(1, .3)', clearProps: 'transform' });
       return;
     }
-    var ticket = 'CT-' + Math.floor(100000 + Math.random() * 900000);
-    var how = reply === 'Email' ? 'email you at ' + email.value.trim() : reply === 'WhatsApp' ? 'WhatsApp you on ' + phone.value.replace(/(\d{5})(\d{5})/, '$1 $2') : 'call you on ' + phone.value.replace(/(\d{5})(\d{5})/, '$1 $2');
-    var now = istNow(), open = now.mins >= toMins('06:30') && now.mins < toMins('21:00');
-    $('#cfDoneText').textContent = 'Thanks, ' + name.value.trim().split(' ')[0] + '. Our care team will ' + how + ' about "' + topic.value.toLowerCase() + '" ' + (open ? 'within the hour.' : 'first thing tomorrow morning.');
-    $('#cfTicket').textContent = 'Reference ' + ticket;
-    $('#cfDone').hidden = false;
-    if (ANIM) gsap.from('#cfDone', { y: 20, opacity: 0, duration: .6, ease: 'power3.out', clearProps: 'transform,opacity' });
-  });
-  $('#cfAgain').addEventListener('click', function () {
-    form.reset(); $('#cfCount').textContent = '0'; $('#cfDone').hidden = true; $('#cfName').focus();
+    // every detail is valid \u2192 go to the message page (not live yet)
+    window.location.href = '404.html';
   });
 
   /* ---------- FAQ accordion ---------- */
