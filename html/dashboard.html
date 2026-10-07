@@ -770,6 +770,12 @@
   function selectHtml(id, options, value) {
     return `<select class="pref-select" id="${id}">${options.map(o => `<option ${value === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
   }
+  function deviceName() {
+    const ua = navigator.userAgent;
+    const browser = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Browser';
+    const os = /Android/.test(ua) ? 'Android' : /iPhone|iPad|iPod/.test(ua) ? 'iOS' : /Windows/.test(ua) ? 'Windows' : /Mac OS X/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : 'this device';
+    return browser + ' on ' + os;
+  }
   function renderSettings() {
     const s = state.settings;
     const displayName = currentUsername || 'Signed out';
@@ -796,6 +802,10 @@
 
       ${card({ title: 'Session', sub: 'Sign out of this account on this device', icon: 'clock' },
         `<div class="session"><p>Signed in as <strong>${esc(displayEmail)}</strong>. Signing out clears the session and returns you to the sign-in screen.</p>
+        <ul class="session-meta">
+          <li><span class="lbl">This device</span><b>${esc(deviceName())}</b></li>
+          <li><span class="lbl">Status</span><b class="session-live"><span class="live-dot"></span>Active now</b></li>
+        </ul>
         <button class="chip chip-danger" id="settings-logout-btn">Sign out</button></div>`)}
 
       ${card({ title: 'Privacy & data', sub: 'These cannot be undone', icon: 'shield' },
